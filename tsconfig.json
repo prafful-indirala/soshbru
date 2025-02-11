@@ -1,0 +1,55 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      // "@/*": [
+      //   "./*"
+      // ],
+      // without `/*` for `folder/index.ts`
+      // with `/*` for accessing the nested folder.
+      "@/*": [
+        "./src/*"
+      ],
+      "@/assets/*": [
+        "../../packages/shared/assets/*",
+        "./assets/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/ui/*": [
+        "./src/components/ui/*"
+      ],
+      "@/elements/*": [
+        "./src/elements/*"
+      ],
+      "@/elements": [
+        "./src/elements"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/store/*": [
+        "./src/store/*"
+      ],
+      "@/store": [
+        "./src/store"
+      ],
+      "@/utils/*": [
+        "./src/utils/*"
+      ],
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "app.d.ts"
+  ]
+}

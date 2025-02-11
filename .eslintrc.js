@@ -1,0 +1,88 @@
+module.exports = {
+  root: true,
+  parser: '@typescript-eslint/parser',
+  env: {
+    jest: true,
+    'jest/globals': true,
+  },
+  extends: [
+    'eslint:recommended',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
+    'airbnb',
+    'airbnb/hooks',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:prettier/recommended',
+    '@react-native',
+  ],
+  plugins: ['@typescript-eslint', 'jest', 'react', 'prettier'],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module',
+    // project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
+  },
+  rules: {
+    'import/no-unresolved': 0,
+    'global-require': 0,
+    'react/jsx-filename-extension': [
+      1,
+      {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    ],
+    'prettier/prettier': [
+      'error',
+      {
+        singleQuote: true,
+        trailingComma: 'all',
+        arrowParens: 'avoid',
+        endOfLine: 'auto',
+        bracketSpacing: true,
+        importOrder: [
+          '^(react/(.*)$)|^(react$)',
+          '^(react-native/(.*)$)|^(react-native$)',
+          '^(@expo/(.*)$)|^(@expo$)',
+          '^(@apollo/(.*)$)|^(@apollo$)',
+          '<THIRD_PARTY_MODULES>',
+          '',
+          '^(@gluestack-ui/(.*)$)|^(@gluestack-ui$)',
+          '',
+          '^(@/store|@/hooks|@/utils)(/.*)$',
+          '^(@/components/(.*)$)|^(@/components$)',
+          '^(@/elements/(.*)$)|^(@/elements$)',
+          '',
+          '^(@/ui/(.*)$)|^(@/ui$)',
+          '',
+          '^[.]',
+        ],
+        importOrderTypeScriptVersion: '5.1.6',
+        tailwindFunctions: ['tva'],
+        plugins: [
+          '@ianvs/prettier-plugin-sort-imports',
+          'prettier-plugin-tailwindcss',
+        ],
+      },
+    ],
+    'import/extensions': ['error', 'never'],
+    'react/function-component-definition': 0,
+    'react/jsx-props-no-spreading': 0,
+    'react/require-default-props': 0,
+    'import/no-extraneous-dependencies': 0,
+    'import/prefer-default-export': 0,
+    'no-underscore-dangle': 0,
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/ban-ts-comment': 0,
+  },
+  settings: {
+    'import/resolver': {
+      node: {
+        paths: ['src'],
+      },
+    },
+  },
+};
