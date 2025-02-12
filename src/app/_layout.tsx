@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
+import { LogBox, useColorScheme } from 'react-native';
 import { ApolloProvider } from '@apollo/client';
 import {
   DarkTheme,
@@ -32,6 +32,9 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// Ignore all log notifications on the simulator
+LogBox.ignoreAllLogs();
 
 function RootLayoutNav() {
   const theme = useStore(state => state.theme);

@@ -28,9 +28,8 @@ export default function AnimatedButton({
 
   const handlePress = async () => {
     opacity.value = withSequence(
-      withTiming(0, { duration: 150 }),
-      withTiming(0, { duration: 300 }),
-      withTiming(1, { duration: 150 }),
+      withTiming(0, { duration: 100 }),
+      withTiming(1, { duration: 100 }),
     );
     await onPress();
   };
@@ -40,7 +39,7 @@ export default function AnimatedButton({
     width: '100%',
     transform: [
       {
-        scale: interpolate(opacity.value, [0, 1], [0.8, 1]),
+        scale: interpolate(opacity.value, [0, 1], [0.9, 1]),
       },
     ],
   }));

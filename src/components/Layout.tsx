@@ -1,8 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { SafeAreaView, StyleProp } from 'react-native';
 
-import { VStack } from '@/components/ui/vstack';
-
 import { Box } from '@/ui/box';
 
 const defaultProps = {

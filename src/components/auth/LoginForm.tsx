@@ -5,10 +5,10 @@ import { useNavigation } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AnimatedButton from '@/components/ui/animated-button';
 import { FormControl } from '@/elements';
 
 import { Box } from '@/ui/box';
-import { Button, ButtonSpinner, ButtonText } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { KeyboardAvoidingView } from '@/ui/keyboard-avoiding-view';
 import { Text } from '@/ui/text';
@@ -102,15 +102,12 @@ const LoginForm = ({ loading, onSubmit }: Props) => {
             Forgot password?
           </Text>
         </Box>
-        <Button
+
+        <AnimatedButton
+          text="Login"
           onPress={handleSubmit(onSubmit)}
-          size="lg"
-          isDisabled={loading}
-          className="mt-6 w-[100%] items-center self-center"
-        >
-          {loading && <ButtonSpinner className="mr-1" />}
-          <ButtonText>Login</ButtonText>
-        </Button>
+          className="mt-8 w-full rounded-full bg-blue-500 py-4"
+        />
       </VStack>
     </KeyboardAvoidingView>
   );
