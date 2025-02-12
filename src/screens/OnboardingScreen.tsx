@@ -1,148 +1,78 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { Dimensions, FlatList, ViewToken } from 'react-native';
-import { router } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { useRouter } from 'expo-router';
+import LottieView from 'lottie-react-native';
 import Animated, {
-  interpolate,
-  useAnimatedStyle,
+  runOnJS,
+  useAnimatedScrollHandler,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
-import { OnboardingSlide } from '@/types/onboarding';
+import type { OnboardingSlide } from '@/types/onboarding';
+import { onboardingSlides } from '@/data/onboardingSlides';
+import { SCREEN_WIDTH } from '@/constants/screen';
 
 import { useFirstTimeUser } from '@/hooks/useFirstTimeUser';
-import {
-  CafeIllustration,
-  GrowthIllustration,
-  NetworkingIllustration,
-} from '@/components/illustrations/OnboardingIllustrations';
+import OnboardingDot from '@/components/OnboardingDot';
+import AnimatedButton from '@/components/ui/animated-button';
+import { Text } from '@/components/ui/text';
+import { View } from '@/components/ui/view';
 
-import { Box } from '@/ui/box';
-import { Button, ButtonText } from '@/ui/button';
-import { HStack } from '@/ui/hstack';
-import { Text } from '@/ui/text';
-import { VStack } from '@/ui/vstack';
+const styles = StyleSheet.create({
+  lottieView: {
+    height: 300,
+    width: 300,
+  },
+});
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-const onboardingSlides: (OnboardingSlide & {
-  Illustration: () => JSX.Element;
-})[] = [
-    {
-      id: 1,
-      title: 'Find Your Perfect Workspace',
-      description:
-        'Discover cozy cafes around you perfect for working and networking',
-      Illustration: CafeIllustration,
-    },
-    {
-      id: 2,
-      title: 'Break the Ice',
-      description: 'Connect with like-minded professionals in your chosen cafe',
-      Illustration: NetworkingIllustration,
-    },
-    {
-      id: 3,
-      title: 'Grow Your Network',
-      description:
-        'Build meaningful connections while enjoying your favorite brew',
-      Illustration: GrowthIllustration,
-    },
-  ];
-
-const AnimatedFlatList = Animated.createAnimatedComponent(
-  FlatList<OnboardingSlide & { Illustration: () => JSX.Element }>,
-);
-
-const OnboardingDot = ({
-  index,
-  scrollX,
-}: {
-  index: number;
-  scrollX: Animated.SharedValue<number>;
-}) => {
-  const dotStyle = useAnimatedStyle(() => {
-    const inputRange = [
-      (index - 1) * SCREEN_WIDTH,
-      index * SCREEN_WIDTH,
-      (index + 1) * SCREEN_WIDTH,
-    ];
-
-    const width = interpolate(scrollX.value, inputRange, [8, 16, 8], 'clamp');
-    const opacity = interpolate(
-      scrollX.value,
-      inputRange,
-      [0.5, 1, 0.5],
-      'clamp',
-    );
-
-    return {
-      width,
-      opacity,
-    };
-  });
-
-  return (
-    <Animated.View
-      style={[
-        {
-          height: 8,
-          borderRadius: 4,
-          backgroundColor: '#007AFF',
-          marginHorizontal: 4,
-        },
-        dotStyle,
-      ]}
-    />
-  );
-};
-
-const OnboardingScreen = () => {
+export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const slidesRef = useRef<FlatList>(null);
   const scrollX = useSharedValue(0);
   const { completeOnboarding } = useFirstTimeUser();
+  const router = useRouter();
 
-  const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      if (viewableItems[0]) {
-        setCurrentIndex(viewableItems[0].index || 0);
-      }
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollX.value = event.contentOffset.x;
+      runOnJS(setCurrentIndex)(
+        Math.round(event.contentOffset.x / SCREEN_WIDTH),
+      );
     },
-    [],
-  );
-
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
-  };
+  });
 
   const renderItem = useCallback(
-    ({
-      item,
-    }: {
-      item: OnboardingSlide & { Illustration: () => JSX.Element };
-    }) => (
-      <Box className="w-screen px-4">
-        <VStack className="items-center justify-center">
-          <Box className="h-[300px] w-[300px] items-center justify-center">
-            <item.Illustration />
-          </Box>
-          <Text className="mt-8 text-center text-2xl font-bold">
+    ({ item }: { item: OnboardingSlide }) => (
+      <View className="w-screen px-4">
+        <View className="items-center justify-center">
+          <View className="h-[300px] w-[300px] items-center justify-center">
+            {item.lottieSource && (
+              <LottieView
+                source={item.lottieSource}
+                autoPlay
+                loop
+                style={styles.lottieView}
+              />
+            )}
+          </View>
+          <Text className="mt-8 text-center text-3xl font-bold text-gray-800">
             {item.title}
           </Text>
-          <Text className="mt-4 text-center text-base text-gray-600">
+          <Text className="mt-4 text-center text-lg text-gray-600">
             {item.description}
           </Text>
-        </VStack>
-      </Box>
+        </View>
+      </View>
     ),
     [],
   );
 
   const handleNext = async () => {
     if (currentIndex < onboardingSlides.length - 1) {
-      slidesRef.current?.scrollToIndex({
-        index: currentIndex + 1,
-        animated: true,
+      scrollX.value = withTiming((currentIndex + 1) * SCREEN_WIDTH, {
+        duration: 300,
       });
+      setCurrentIndex(currentIndex + 1);
     } else {
       await completeOnboarding();
       router.replace('/auth/register');
@@ -150,47 +80,43 @@ const OnboardingScreen = () => {
   };
 
   return (
-    <Box className="flex-1 bg-white">
-      <AnimatedFlatList
-        ref={slidesRef}
+    <View className="flex-1 bg-white">
+      <Animated.FlatList
         data={onboardingSlides}
         renderItem={renderItem}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={event => {
-          scrollX.value = event.nativeEvent.contentOffset.x;
-        }}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
         keyExtractor={item => `slide-${item.id}`}
       />
-      <VStack className="absolute bottom-12 w-full items-center px-4">
-        <HStack space="sm" className="mt-4">
-          {onboardingSlides.map((_, index) => (
-            <OnboardingDot
-              key={`dot-${index}`}
-              index={index}
-              scrollX={scrollX}
-            />
-          ))}
-        </HStack>
-        <Button
-          size="lg"
-          variant="solid"
-          className="mt-8 w-full"
-          onPress={handleNext}
-        >
-          <Text>
-            hello
-            {currentIndex === onboardingSlides.length - 1
-              ? 'Get Started'
-              : 'Next'}
-          </Text>
-        </Button>
-      </VStack>
-    </Box>
+      <BlurView
+        intensity={80}
+        tint="light"
+        className="absolute bottom-0 left-0 right-0"
+      >
+        <View className="w-full items-center px-4 py-8">
+          <View className="mt-4 flex-row space-x-2">
+            {onboardingSlides.map((slide: OnboardingSlide) => (
+              <OnboardingDot
+                key={`dot-${slide.id}`}
+                index={onboardingSlides.indexOf(slide)}
+                scrollX={scrollX}
+              />
+            ))}
+          </View>
+          <AnimatedButton
+            text={
+              currentIndex === onboardingSlides.length - 1
+                ? 'Get Started'
+                : 'Next'
+            }
+            onPress={handleNext}
+            className="mt-8 w-full rounded-full bg-blue-500 py-4"
+          />
+        </View>
+      </BlurView>
+    </View>
   );
-};
-
-export default OnboardingScreen;
+}
