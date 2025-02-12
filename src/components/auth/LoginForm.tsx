@@ -96,8 +96,9 @@ const LoginForm = ({ loading, onSubmit }: Props) => {
             )}
           />
           <Text
+            variant="medium"
             onPress={() => navigation.navigate('PasswordResetScreen')}
-            className="text-sm"
+            className="text-sm text-blue-600"
           >
             Forgot password?
           </Text>

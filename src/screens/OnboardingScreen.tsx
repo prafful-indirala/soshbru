@@ -55,7 +55,7 @@ export default function OnboardingScreen() {
               />
             )}
           </View>
-          <Text className="mt-8 text-center text-3xl font-bold text-gray-800">
+          <Text className="font-heading mt-8 text-center text-3xl text-gray-800">
             {item.title}
           </Text>
           <Text className="mt-4 text-center text-lg text-gray-600">

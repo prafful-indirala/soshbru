@@ -195,7 +195,11 @@ module.exports = {
         },
       },
       fontFamily: {
-        roboto: ['Roboto', 'sans-serif'],
+        body: ['Poppins_400Regular'],
+        heading: ['Poppins_600SemiBold'],
+        mono: ['Poppins_400Regular'],
+        bold: ['Poppins_700Bold'],
+        medium: ['Poppins_500Medium'],
       },
       fontWeight: {
         hairline: '100',

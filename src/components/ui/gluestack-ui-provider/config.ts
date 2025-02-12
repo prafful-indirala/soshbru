@@ -5,6 +5,13 @@ import { vars } from 'nativewind';
 // Generate color code from  https://smart-swatch.netlify.app
 
 export const config = {
+  fonts: {
+    heading: 'Poppins_600SemiBold',
+    body: 'Poppins_400Regular',
+    mono: 'Poppins_400Regular',
+    bold: 'Poppins_700Bold',
+    medium: 'Poppins_500Medium',
+  },
   light: vars({
     '--color-primary-0': '#B3B3B3',
     '--color-primary-50': '#999999',

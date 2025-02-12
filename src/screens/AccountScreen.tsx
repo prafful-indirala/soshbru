@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
+import { SearchIcon, User2Icon } from 'lucide-react-native';
 
 import Layout from '@/components/Layout';
+import { HStack } from '@/components/ui/hstack';
+import { Text } from '@/components/ui/text';
 
-import { Button, ButtonText } from '@/ui/button';
 import { VStack } from '@/ui/vstack';
 
 export default function AccountScreen() {
@@ -17,19 +18,10 @@ export default function AccountScreen() {
   return (
     <Layout>
       <VStack className="gap-16">
-        <Button
-          size="md"
-          variant="solid"
-          action="primary"
-          isDisabled={false}
-          isFocusVisible={false}
-          onPress={() => {
-            Alert.alert('Button clicked!');
-          }}
-          className="mx-[4px]"
-        >
-          <ButtonText>Account Screen</ButtonText>
-        </Button>
+        <HStack className="items-center gap-2 self-center p-10">
+          <User2Icon size={30} color="orange" />
+          <Text>Account Feature coming soon...</Text>
+        </HStack>
       </VStack>
     </Layout>
   );

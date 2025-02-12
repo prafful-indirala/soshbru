@@ -46,6 +46,9 @@ export default function TabLayout() {
           name={tab?.name}
           options={{
             tabBarLabel: tab?.title,
+            tabBarLabelStyle: {
+              fontFamily: 'Poppins',
+            },
             tabBarIcon: ({ color }) => createElement(tab.icon, { color }),
           }}
         />
