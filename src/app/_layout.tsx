@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
-// import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { ApolloProvider } from '@apollo/client';
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider as NavigationThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router/stack';
@@ -14,6 +13,7 @@ import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from 'react-native-safe-area-context';
+import { useStore } from '@/store';
 
 import apolloClient, { apolloPersistor } from '@/utils/apollo-client';
 
@@ -27,8 +27,6 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  // initialRouteName: '(tabs)',
   initialRouteName: 'index',
 };
 
@@ -36,13 +34,22 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const theme = useStore(state => state.theme);
+  const setTheme = useStore(state => state.setTheme);
+  const systemColorScheme = useColorScheme();
+
+  // Set initial theme based on system preference if no theme is set
+  useEffect(() => {
+    if (systemColorScheme) {
+      setTheme(systemColorScheme);
+    }
+  }, [systemColorScheme, setTheme]);
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <GluestackUIProvider mode={(colorScheme ?? 'light') as 'light' | 'dark'}>
-        <ThemeProvider
-          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+      <GluestackUIProvider mode={theme}>
+        <NavigationThemeProvider
+          value={theme === 'dark' ? DarkTheme : DefaultTheme}
         >
           <Stack>
             <Stack.Screen
@@ -51,20 +58,16 @@ function RootLayoutNav() {
             />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="auth" options={{ headerShown: false }} />
-
             <Stack.Screen name="+not-found" />
           </Stack>
-        </ThemeProvider>
+        </NavigationThemeProvider>
       </GluestackUIProvider>
     </SafeAreaProvider>
   );
 }
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    // SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    // ...FontAwesome.font,
-  });
+  const [loaded, error] = useFonts({});
   const [client, setClient] = useState(undefined);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
@@ -85,7 +88,6 @@ export default function RootLayout() {
         await apolloPersistor.restore();
         setClient(apolloClient);
       } catch (e) {
-        // We might want to provide this error information to an error reporting service
         console.warn(e);
       }
     }
