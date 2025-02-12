@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigation } from 'expo-router';
-import { SearchIcon, User2Icon } from 'lucide-react-native';
+import { User2Icon } from 'lucide-react-native';
 
 import Layout from '@/components/Layout';
 import { HStack } from '@/components/ui/hstack';

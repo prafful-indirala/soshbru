@@ -25,7 +25,7 @@ import {
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider as NavigationThemeProvider,
+  ThemeProvider,
 } from '@react-navigation/native';
 import { Stack } from 'expo-router/stack';
 import * as SplashScreen from 'expo-splash-screen';
@@ -71,9 +71,7 @@ function RootLayoutNav() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <GluestackUIProvider mode={theme}>
-        <NavigationThemeProvider
-          value={theme === 'dark' ? DarkTheme : DefaultTheme}
-        >
+        <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
             <Stack.Screen
               name="onboarding"
@@ -83,7 +81,7 @@ function RootLayoutNav() {
             <Stack.Screen name="auth" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
-        </NavigationThemeProvider>
+        </ThemeProvider>
       </GluestackUIProvider>
     </SafeAreaProvider>
   );

@@ -14,7 +14,9 @@ import { onboardingSlides } from '@/data/onboardingSlides';
 import { SCREEN_WIDTH } from '@/constants/screen';
 
 import { useFirstTimeUser } from '@/hooks/useFirstTimeUser';
+import Layout from '@/components/Layout';
 import OnboardingDot from '@/components/OnboardingDot';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import AnimatedButton from '@/components/ui/animated-button';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
@@ -55,12 +57,10 @@ export default function OnboardingScreen() {
               />
             )}
           </View>
-          <Text className="font-heading mt-8 text-center text-3xl text-gray-800">
+          <Text className="font-heading mt-8 text-center text-3xl">
             {item.title}
           </Text>
-          <Text className="mt-4 text-center text-lg text-gray-600">
-            {item.description}
-          </Text>
+          <Text className="mt-4 text-center text-lg">{item.description}</Text>
         </View>
       </View>
     ),
@@ -80,22 +80,23 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <Animated.FlatList
-        data={onboardingSlides}
-        renderItem={renderItem}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        keyExtractor={item => `slide-${item.id}`}
-      />
-      <BlurView
-        intensity={80}
-        tint="light"
-        className="absolute bottom-0 left-0 right-0"
-      >
+    <Layout hasSafeArea={false}>
+      <View className="flex-1">
+        <Animated.FlatList
+          data={onboardingSlides}
+          renderItem={renderItem}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+          keyExtractor={item => `slide-${item.id}`}
+        />
+        {/* <BlurView
+          intensity={80}
+          tint="light"
+          className="absolute bottom-0 left-0 right-0"
+        > */}
         <View className="w-full items-center px-4 py-8">
           <View className="mt-4 flex-row space-x-2">
             {onboardingSlides.map((slide: OnboardingSlide) => (
@@ -106,6 +107,7 @@ export default function OnboardingScreen() {
               />
             ))}
           </View>
+          {/* <ThemeToggle /> */}
           <AnimatedButton
             text={
               currentIndex === onboardingSlides.length - 1
@@ -116,7 +118,8 @@ export default function OnboardingScreen() {
             className="mt-8 w-full rounded-full bg-blue-500 py-4"
           />
         </View>
-      </BlurView>
-    </View>
+        {/* </BlurView> */}
+      </View>
+    </Layout>
   );
 }

@@ -11,8 +11,8 @@ export default function HomeScreen() {
   const { logout } = useAuth();
 
   return (
-    <Layout>
-      <VStack className="content-center items-center justify-center gap-[8px]">
+    <Layout hasSafeArea={false}>
+      <VStack className="h-full content-center items-center justify-center gap-[8px]">
         <Text>Home Screen</Text>
         <ThemeToggle />
         <AnimatedButton
