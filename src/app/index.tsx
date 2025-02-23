@@ -14,16 +14,16 @@ export default function Index() {
     return null;
   }
 
-  // First time users see onboarding
+  // // First time users see onboarding
   if (isFirstTime) {
     return <Redirect href={'onboarding' as Href<string>} />;
   }
 
-  // Not logged in users go to auth
+  // // Not logged in users go to login
   if (!isLoggedIn) {
-    return <Redirect href={'auth' as Href<string>} />;
+    return <Redirect href={'auth/login' as Href<string>} />;
   }
 
   // Logged in users go to home
-  return <Redirect href={'(tabs)/home' as Href<string>} />;
+  return <Redirect href={'/(tabs)' as Href<string>} />;
 }

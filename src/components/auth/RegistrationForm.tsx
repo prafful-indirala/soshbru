@@ -1,118 +1,117 @@
 import React from 'react';
-import { Keyboard, ScrollView } from 'react-native';
+import { Alert, Keyboard, ScrollView } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { UserProfile } from '@/types/onboarding';
 
-import { FormControl } from '@/elements';
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
+import { HStack } from '@/components/ui/hstack';
+import { Input, InputField } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import FormControl from '@/elements/FormControl';
 
-import { Box } from '@/ui/box';
-import { Button, ButtonSpinner, ButtonText } from '@/ui/button';
-import { Input, InputField } from '@/ui/input';
 import { KeyboardAvoidingView } from '@/ui/keyboard-avoiding-view';
-import {
-  Select,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicator,
-  SelectDragIndicatorWrapper,
-  SelectInput,
-  SelectItem,
-  SelectPortal,
-  SelectTrigger,
-} from '@/ui/select';
-import { Text } from '@/ui/text';
-import { Textarea, TextareaInput } from '@/ui/textarea';
-import { VStack } from '@/ui/vstack';
 
-const networkingInterests = [
-  { label: 'Professional Networking', value: 'professional' },
-  { label: 'Casual Meetups', value: 'casual' },
-  { label: 'Mentorship', value: 'mentorship' },
-] as const;
+const registrationSchema = z
+  .object({
+    email: z.string().email('Invalid email address'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+      ),
+    confirmPassword: z.string(),
+    full_name: z.string().min(2, 'Name is required'),
+    designation: z.string().optional(),
+    bio: z.string().optional(),
+    linkedin_url: z
+      .string()
+      .url('Invalid LinkedIn URL')
+      .optional()
+      .or(z.literal('')),
+    github_url: z
+      .string()
+      .url('Invalid GitHub URL')
+      .optional()
+      .or(z.literal('')),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
-const schema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  fullName: z.string().min(2, 'Full name is required'),
-  bio: z.string().max(200, 'Bio must be less than 200 characters').optional(),
-  interests: z.array(z.string()).min(1, 'Select at least one interest'),
-  networkingInterests: z
-    .array(z.enum(['professional', 'casual', 'mentorship']))
-    .min(1, 'Select at least one networking preference'),
-});
+export type RegistrationFormData = z.infer<typeof registrationSchema>;
 
-type RegistrationFormData = z.infer<typeof schema>;
-
-interface Props {
+interface RegistrationFormProps {
   loading?: boolean;
-  onSubmit: (data: RegistrationFormData) => void;
+  onSubmit: (
+    email: string,
+    password: string,
+    userData: {
+      full_name: string;
+      designation?: string;
+      bio?: string;
+      linkedin_url?: string;
+      github_url?: string;
+    },
+  ) => Promise<boolean>;
 }
 
-const RegistrationForm = ({ loading, onSubmit }: Props) => {
+export default function RegistrationForm({
+  loading = false,
+  onSubmit,
+}: RegistrationFormProps) {
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<RegistrationFormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(registrationSchema),
     defaultValues: {
-      networkingInterests: [],
-      interests: [],
+      email: '',
+      password: '',
+      confirmPassword: '',
+      full_name: '',
+      designation: '',
+      bio: '',
+      linkedin_url: '',
+      github_url: '',
     },
   });
 
   return (
-    <KeyboardAvoidingView onTouchStart={Keyboard.dismiss} className="w-[90%]">
+    <KeyboardAvoidingView
+      onTouchStart={() => Keyboard.dismiss()}
+      className="w-[90%]"
+    >
       <ScrollView showsVerticalScrollIndicator={false}>
-        <VStack space="md">
+        <VStack className="w-full space-y-4 px-4">
           <Controller
-            name="fullName"
             control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormControl
-                label="Full Name"
-                isInvalid={errors.fullName}
-                isRequired
-                helperMsg=""
-              >
-                <Input>
-                  <InputField
-                    placeholder="John Doe"
-                    onChangeText={onChange}
-                    value={value}
-                    autoCorrect={false}
-                    autoCapitalize="words"
-                  />
-                </Input>
-              </FormControl>
-            )}
-          />
-
-          <Controller
             name="email"
-            control={control}
-            render={({ field: { onChange, value } }) => (
+            render={({ field: { onChange, onBlur, value } }) => (
               <FormControl
                 label="Email"
-                isInvalid={errors.email}
                 isRequired
-                helperMsg=""
+                isInvalid={errors.email}
+                helperMsg="We'll never share your email"
               >
                 <Input>
                   <InputField
-                    placeholder="john@example.com"
+                    type="text"
+                    onBlur={onBlur}
                     onChangeText={onChange}
+                    defaultValue={value}
                     value={value}
+                    autoFocus
                     autoCorrect={false}
-                    autoCapitalize="none"
+                    autoComplete="email"
                     keyboardType="email-address"
+                    autoCapitalize="none"
+                    placeholder="Enter your email"
                   />
                 </Input>
               </FormControl>
@@ -120,22 +119,139 @@ const RegistrationForm = ({ loading, onSubmit }: Props) => {
           />
 
           <Controller
-            name="password"
             control={control}
-            render={({ field: { onChange, value } }) => (
+            name="full_name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl
+                label="Full Name"
+                isRequired
+                isInvalid={errors.full_name}
+                helperMsg="How should we address you?"
+              >
+                <Input>
+                  <InputField
+                    type="text"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    defaultValue={value}
+                    placeholder="Enter your full name"
+                  />
+                </Input>
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
               <FormControl
                 label="Password"
-                isInvalid={errors.password}
                 isRequired
-                helperMsg="Must be at least 8 characters with uppercase, lowercase, and number"
+                isInvalid={errors.password}
+                helperMsg="Must be 8+ characters with uppercase, lowercase, and number"
               >
                 <Input>
                   <InputField
-                    type="password"
-                    placeholder="Enter your password"
+                    type="text"
+                    onBlur={onBlur}
                     onChangeText={onChange}
-                    value={value}
-                    autoCorrect={false}
+                    defaultValue={value}
+                    secureTextEntry
+                    placeholder="Create a password"
+                  />
+                </Input>
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl
+                label="Confirm Password"
+                isRequired
+                isInvalid={errors.confirmPassword}
+                helperMsg=""
+              >
+                <Input>
+                  <InputField
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    defaultValue={value}
+                    secureTextEntry
+                    placeholder="Confirm your password"
+                  />
+                </Input>
+              </FormControl>
+            )}
+          />
+
+          <Text className="mt-4 font-medium">Optional Information</Text>
+
+          <Controller
+            control={control}
+            name="designation"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl
+                label="Designation"
+                isRequired={false}
+                isInvalid={errors.designation}
+                helperMsg="Your professional role"
+              >
+                <Input>
+                  <InputField
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    defaultValue={value}
+                    placeholder="What's your role? (e.g., Software Engineer)"
+                  />
+                </Input>
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="bio"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl
+                label="Bio"
+                isRequired={false}
+                isInvalid={errors.bio}
+                helperMsg="Share a bit about yourself"
+              >
+                <Input>
+                  <InputField
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    defaultValue={value}
+                    placeholder="Tell us about yourself"
+                    multiline
+                    numberOfLines={3}
+                  />
+                </Input>
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="linkedin_url"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormControl
+                label="LinkedIn Profile"
+                isRequired={false}
+                isInvalid={errors.linkedin_url}
+                helperMsg="Link to your LinkedIn profile"
+              >
+                <Input>
+                  <InputField
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    defaultValue={value}
+                    placeholder="Your LinkedIn profile URL"
                     autoCapitalize="none"
                   />
                 </Input>
@@ -144,82 +260,65 @@ const RegistrationForm = ({ loading, onSubmit }: Props) => {
           />
 
           <Controller
-            name="bio"
             control={control}
-            render={({ field: { onChange, value } }) => (
+            name="github_url"
+            render={({ field: { onChange, onBlur, value } }) => (
               <FormControl
-                label="Bio"
-                isInvalid={errors.bio}
-                helperMsg="Tell others about yourself (optional)"
+                label="GitHub Profile"
                 isRequired={false}
+                isInvalid={errors.github_url}
+                helperMsg="Link to your GitHub profile"
               >
-                <Textarea size="md" className="min-h-[100px]">
-                  <TextareaInput
-                    placeholder="I'm a software developer looking to meet other tech professionals..."
+                <Input>
+                  <InputField
+                    onBlur={onBlur}
                     onChangeText={onChange}
-                    value={value}
-                    autoCorrect={true}
+                    defaultValue={value}
+                    placeholder="Your GitHub profile URL"
+                    autoCapitalize="none"
                   />
-                </Textarea>
+                </Input>
               </FormControl>
             )}
           />
 
-          <Controller
-            name="networkingInterests"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormControl
-                label="Networking Preferences"
-                isInvalid={
-                  errors.networkingInterests
-                    ? {
-                      type: 'validation',
-                      message: errors.networkingInterests.message,
-                    }
-                    : undefined
+          <HStack className="mt-6 w-full justify-end">
+            <Button
+              onPress={handleSubmit(async data => {
+                try {
+                  const success = await onSubmit(data.email, data.password, {
+                    full_name: data.full_name,
+                    designation: data.designation,
+                    bio: data.bio,
+                    linkedin_url: data.linkedin_url,
+                    github_url: data.github_url,
+                  });
+
+                  if (!success) {
+                    throw new Error('Failed to create account');
+                  }
+                } catch (error) {
+                  console.error('Registration error:', error);
+                  Alert.alert(
+                    'Registration Failed',
+                    error instanceof Error
+                      ? error.message
+                      : 'An unknown error occurred',
+                  );
                 }
-                isRequired
-                helperMsg=""
-              >
-                <Box className="flex flex-row flex-wrap gap-2">
-                  {networkingInterests.map(interest => (
-                    <Button
-                      key={interest.value}
-                      variant={
-                        value.includes(interest.value) ? 'solid' : 'outline'
-                      }
-                      onPress={() => {
-                        const newValue = value.includes(interest.value)
-                          ? value.filter(v => v !== interest.value)
-                          : [...value, interest.value];
-                        onChange(newValue);
-                      }}
-                      size="sm"
-                    >
-                      <ButtonText>{interest.label}</ButtonText>
-                    </Button>
-                  ))}
-                </Box>
-              </FormControl>
-            )}
-          />
-
-          <Box className="h-4" />
-
-          <Button
-            onPress={handleSubmit(onSubmit)}
-            size="lg"
-            isDisabled={loading}
-            className="mt-4 w-full items-center self-center"
-          >
-            {loading && <ButtonSpinner className="mr-1" />}
-            <ButtonText>Create Account</ButtonText>
-          </Button>
+              })}
+              disabled={loading}
+              action="primary"
+              variant="solid"
+              size="lg"
+              className="w-full"
+            >
+              <ButtonText>Create Account</ButtonText>
+              {loading && <ButtonSpinner />}
+            </Button>
+          </HStack>
         </VStack>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
-
-export default RegistrationForm;
+}

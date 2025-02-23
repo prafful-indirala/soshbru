@@ -1,117 +1,223 @@
-import React from 'react';
-import { Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Keyboard } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigation } from 'expo-router';
+import { Link } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import {
+  signInWithApple,
+  signInWithGoogle,
+  signInWithLinkedIn,
+} from '@/services/supabase';
 
-import AnimatedButton from '@/components/ui/animated-button';
-import { FormControl } from '@/elements';
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
+import { Divider } from '@/components/ui/divider';
+import { HStack } from '@/components/ui/hstack';
+import { AtSignIcon, CircleIcon, LinkIcon } from '@/components/ui/icon';
+import { Input, InputField } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import FormControl from '@/elements/FormControl';
 
-import { Box } from '@/ui/box';
-import { Input } from '@/ui/input';
 import { KeyboardAvoidingView } from '@/ui/keyboard-avoiding-view';
-import { Text } from '@/ui/text';
-import { VStack } from '@/ui/vstack';
 
-export type FormData = {
-  email: string;
-  password: string;
-};
-
-export const defaultProps = {
-  loading: false,
-  onSubmit: (data: FormData) => console.log('onSubmit props', data),
-};
-
-export type Props = {
-  loading?: boolean;
-  onSubmit: (data: FormData) => void;
-} & typeof defaultProps;
-
-const schema = z.object({
-  email: z.string().email(),
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
 });
 
-const LoginForm = ({ loading, onSubmit }: Props) => {
-  const navigation = useNavigation();
+export type LoginFormData = z.infer<typeof loginSchema>;
+
+interface LoginFormProps {
+  loading: boolean;
+  onSubmit: (email: string, password: string) => Promise<boolean>;
+}
+
+export default function LoginForm({ loading, onSubmit }: LoginFormProps) {
+  const [socialLoading, setSocialLoading] = useState<{
+    google: boolean;
+    apple: boolean;
+    linkedin: boolean;
+  }>({
+    google: false,
+    apple: false,
+    linkedin: false,
+  });
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
-  // console.log('LoginForm errors', errors);
+
+  const handleSocialLogin = async (
+    provider: 'google' | 'apple' | 'linkedin',
+    loginFn: () => Promise<any>,
+  ) => {
+    try {
+      setSocialLoading(prev => ({ ...prev, [provider]: true }));
+      await loginFn();
+    } catch (error) {
+      console.error(`${provider} login error:`, error);
+      Alert.alert(
+        'Login Failed',
+        error instanceof Error
+          ? error.message
+          : `Failed to login with ${provider}`,
+      );
+    } finally {
+      setSocialLoading(prev => ({ ...prev, [provider]: false }));
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       onTouchStart={() => Keyboard.dismiss()}
       className="w-[90%]"
     >
-      <VStack>
+      <VStack className="w-full space-y-4 px-4">
         <Controller
-          name="email"
           control={control}
+          name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <FormControl label="Email" isInvalid={errors?.email} isRequired>
-              <Input
-                type="text"
-                placeholder="john@doe.com"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                defaultValue={value}
-                value={value}
-                autoFocus
-                autoCorrect={false}
-                autoComplete="email"
-                autoCapitalize="none"
-              />
-            </FormControl>
-          )}
-        />
-        <Box>
-          <Controller
-            name="password"
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <FormControl
-                label="Password"
-                isInvalid={errors?.password}
-                isRequired
-              >
-                <Input
-                  type="password"
-                  placeholder="password"
+            <FormControl
+              label="Email"
+              isRequired
+              isInvalid={errors.email}
+              helperMsg="We'll never share your email"
+            >
+              <Input>
+                <InputField
+                  type="text"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   defaultValue={value}
                   value={value}
+                  autoFocus
                   autoCorrect={false}
-                  autoComplete="password"
+                  autoComplete="email"
+                  keyboardType="email-address"
                   autoCapitalize="none"
+                  placeholder="Enter your email"
                 />
-              </FormControl>
-            )}
-          />
-          <Text
-            variant="medium"
-            onPress={() => navigation.navigate('PasswordResetScreen')}
-            className="text-sm text-blue-600"
-          >
-            Forgot password?
-          </Text>
-        </Box>
-
-        <AnimatedButton
-          text="Login"
-          onPress={handleSubmit(onSubmit)}
-          className="mt-8 w-full rounded-full bg-blue-500 py-4"
+              </Input>
+            </FormControl>
+          )}
         />
+
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormControl
+              label="Password"
+              isRequired
+              isInvalid={errors.password}
+              helperMsg=""
+            >
+              <Input>
+                <InputField
+                  type="password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  secureTextEntry
+                  placeholder="Enter your password"
+                />
+              </Input>
+            </FormControl>
+          )}
+        />
+
+        <Link href="/auth/forgot-password" asChild>
+          <Text className="text-right text-primary-600">Forgot password?</Text>
+        </Link>
+
+        <Button
+          onPress={handleSubmit(async data => {
+            try {
+              const success = await onSubmit(data.email, data.password);
+              if (!success) {
+                throw new Error('Failed to login');
+              }
+            } catch (error) {
+              console.error('Login error:', error);
+              Alert.alert(
+                'Login Failed',
+                error instanceof Error
+                  ? error.message
+                  : 'An unknown error occurred',
+              );
+            }
+          })}
+          disabled={loading}
+          action="primary"
+          variant="solid"
+          size="lg"
+          className="mt-6 w-full"
+        >
+          <ButtonText>Login with Email</ButtonText>
+          {loading && <ButtonSpinner />}
+        </Button>
+
+        <HStack className="items-center py-4">
+          <Divider className="flex-1" />
+          <Text className="px-4 text-gray-500">or continue with</Text>
+          <Divider className="flex-1" />
+        </HStack>
+
+        <Button
+          variant="outline"
+          size="lg"
+          className="w-full"
+          onPress={() => handleSocialLogin('google', signInWithGoogle)}
+          disabled={socialLoading.google}
+        >
+          <AtSignIcon width={16} height={16} />
+          <ButtonText className="ml-2">
+            {socialLoading.google ? 'Signing in...' : 'Continue with Google'}
+          </ButtonText>
+          {socialLoading.google && <ButtonSpinner />}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="lg"
+          className="mt-4 w-full"
+          onPress={() => handleSocialLogin('apple', signInWithApple)}
+          disabled={socialLoading.apple}
+        >
+          <CircleIcon width={16} height={16} />
+          <ButtonText className="ml-2">
+            {socialLoading.apple ? 'Signing in...' : 'Continue with Apple'}
+          </ButtonText>
+          {socialLoading.apple && <ButtonSpinner />}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="lg"
+          className="mt-4 w-full"
+          onPress={() => handleSocialLogin('linkedin', signInWithLinkedIn)}
+          disabled={socialLoading.linkedin}
+        >
+          <LinkIcon width={16} height={16} />
+          <ButtonText className="ml-2">
+            {socialLoading.linkedin
+              ? 'Signing in...'
+              : 'Continue with LinkedIn'}
+          </ButtonText>
+          {socialLoading.linkedin && <ButtonSpinner />}
+        </Button>
       </VStack>
     </KeyboardAvoidingView>
   );
-};
-
-export default LoginForm;
+}

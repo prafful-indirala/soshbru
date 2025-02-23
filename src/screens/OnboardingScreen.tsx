@@ -1,5 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { SCREEN_WIDTH } from '@/constants/screen';
+import { onboardingSlides } from '@/data/onboardingSlides';
+import type { OnboardingSlide } from '@/types/onboarding';
 import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import LottieView from 'lottie-react-native';
@@ -9,14 +12,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import type { OnboardingSlide } from '@/types/onboarding';
-import { onboardingSlides } from '@/data/onboardingSlides';
-import { SCREEN_WIDTH } from '@/constants/screen';
 
 import { useFirstTimeUser } from '@/hooks/useFirstTimeUser';
 import Layout from '@/components/Layout';
 import OnboardingDot from '@/components/OnboardingDot';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import AnimatedButton from '@/components/ui/animated-button';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
@@ -57,7 +56,7 @@ export default function OnboardingScreen() {
               />
             )}
           </View>
-          <Text className="font-heading mt-8 text-center text-3xl">
+          <Text className="mt-8 text-center font-heading text-3xl">
             {item.title}
           </Text>
           <Text className="mt-4 text-center text-lg">{item.description}</Text>
@@ -75,7 +74,7 @@ export default function OnboardingScreen() {
       setCurrentIndex(currentIndex + 1);
     } else {
       await completeOnboarding();
-      router.replace('/auth/register');
+      router.replace('/auth/login');
     }
   };
 
@@ -92,33 +91,33 @@ export default function OnboardingScreen() {
           scrollEventThrottle={16}
           keyExtractor={item => `slide-${item.id}`}
         />
-        {/* <BlurView
+        <BlurView
           intensity={80}
           tint="light"
           className="absolute bottom-0 left-0 right-0"
-        > */}
-        <View className="w-full items-center px-4 py-8">
-          <View className="mt-4 flex-row space-x-2">
-            {onboardingSlides.map((slide: OnboardingSlide) => (
-              <OnboardingDot
-                key={`dot-${slide.id}`}
-                index={onboardingSlides.indexOf(slide)}
-                scrollX={scrollX}
-              />
-            ))}
+        >
+          <View className="w-full items-center px-4 py-8">
+            <View className="mt-4 flex-row space-x-2">
+              {onboardingSlides.map((slide: OnboardingSlide) => (
+                <OnboardingDot
+                  key={`dot-${slide.id}`}
+                  index={onboardingSlides.indexOf(slide)}
+                  scrollX={scrollX}
+                />
+              ))}
+            </View>
+            {/* <ThemeToggle /> */}
+            <AnimatedButton
+              text={
+                currentIndex === onboardingSlides.length - 1
+                  ? 'Get Started'
+                  : 'Next'
+              }
+              onPress={handleNext}
+              className="mt-8 w-full rounded-full bg-blue-500 py-4"
+            />
           </View>
-          {/* <ThemeToggle /> */}
-          <AnimatedButton
-            text={
-              currentIndex === onboardingSlides.length - 1
-                ? 'Get Started'
-                : 'Next'
-            }
-            onPress={handleNext}
-            className="mt-8 w-full rounded-full bg-blue-500 py-4"
-          />
-        </View>
-        {/* </BlurView> */}
+        </BlurView>
       </View>
     </Layout>
   );

@@ -1,62 +1,47 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import storage from '@/utils/storage';
-
-const asyncStorage = {
-  setItem: async (name: string, value: string) => {
-    await storage.setItem(name, value);
-  },
-  getItem: async (name: string) => {
-    const value = await storage.getItem(name);
-    return value ?? null;
-  },
-  removeItem: async (name: string) => {
-    await storage.removeItem(name);
-  },
-};
-
-interface User {
-  // Define user properties here
+interface AuthUser {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  designation: string | null;
+  bio: string | null;
+  linkedin_url: string | null;
+  github_url: string | null;
 }
 
 type ThemeMode = 'light' | 'dark';
 
-type State = {
+interface AppState {
   isLoggedIn: boolean;
-  user: User;
+  user: AuthUser | null;
   theme: ThemeMode;
-};
-
-type Actions = {
-  reset: () => void;
-  setIsLoggedIn: (data: boolean) => void;
-  setUser: (data: User) => void;
+  setIsLoggedIn: (value: boolean) => void;
+  setUser: (user: AuthUser) => void;
   toggleTheme: () => void;
   setTheme: (theme: ThemeMode) => void;
-};
+  reset: () => void;
+}
 
-// define the initial state
-const initialState: State = {
-  isLoggedIn: false,
-  user: {} as User,
-  theme: 'light', // Default theme, will be updated based on system preference in _layout.tsx
-};
-
-export const useStore = create<State & Actions>()(
+export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
-      ...initialState,
-      reset: () => set(initialState),
-      setIsLoggedIn: (data: boolean) => set({ isLoggedIn: data }),
-      setUser: (data: User) => set({ user: data }),
+      isLoggedIn: false,
+      user: null,
+      theme: 'light',
+      setIsLoggedIn: value => set({ isLoggedIn: value }),
+      setUser: user => set({ user }),
       toggleTheme: () =>
         set({ theme: get().theme === 'light' ? 'dark' : 'light' }),
       setTheme: (theme: ThemeMode) => set({ theme }),
+      reset: () => set({ isLoggedIn: false, user: null }),
     }),
     {
-      name: 'app-store',
-      storage: createJSONStorage(() => asyncStorage),
+      name: 'app-storage',
+      storage: createJSONStorage(() => AsyncStorage),
     },
   ),
 );
