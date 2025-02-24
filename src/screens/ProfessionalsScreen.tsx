@@ -1,18 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  Alert,
-  Animated,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Animated } from 'react-native';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { Box } from '@/components/ui/box';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
 
 interface Professional {
   id: string;
@@ -48,28 +43,6 @@ const MOCK_PROFESSIONALS: Professional[] = [
     status: 'busy',
     checkInTime: '1 hour ago',
   },
-  {
-    id: '3',
-    name: 'Priya Patel',
-    role: 'Product Manager',
-    company: 'Innovation Labs',
-    imageUrl:
-      'https://api.a0.dev/assets/image?text=professional%20indian%20woman%20product%20manager%20headshot',
-    skills: ['Strategy', 'Agile', 'Leadership'],
-    status: 'available',
-    checkInTime: '30 mins ago',
-  },
-  {
-    id: '4',
-    name: 'David Kim',
-    role: 'Data Scientist',
-    company: 'AI Solutions',
-    imageUrl:
-      'https://api.a0.dev/assets/image?text=professional%20asian%20man%20data%20scientist%20headshot',
-    skills: ['Python', 'Machine Learning', 'Data Analysis'],
-    status: 'do-not-disturb',
-    checkInTime: '45 mins ago',
-  },
 ];
 
 export default function ProfessionalsScreen() {
@@ -79,46 +52,24 @@ export default function ProfessionalsScreen() {
   const slideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        tension: 50,
-        friction: 7,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+    const animateIn = () => {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    };
 
-  const getStatusColor = (status: Professional['status']) => {
-    switch (status) {
-      case 'available':
-        return '#4CAF50';
-      case 'busy':
-        return '#FFC107';
-      case 'do-not-disturb':
-        return '#FF5252';
-      default:
-        return '#999';
-    }
-  };
-
-  const getStatusText = (status: Professional['status']) => {
-    switch (status) {
-      case 'available':
-        return 'Available to Connect';
-      case 'busy':
-        return 'Currently Busy';
-      case 'do-not-disturb':
-        return 'Do Not Disturb';
-      default:
-        return 'Unknown Status';
-    }
-  };
+    animateIn();
+  }, [fadeAnim, slideAnim]);
 
   const handleConnect = (professional: Professional) => {
     if (professional.status === 'do-not-disturb') {
@@ -136,254 +87,114 @@ export default function ProfessionalsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1a73e8', '#0d47a1']} style={styles.header}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+    <Box className="bg-backgroundLight0 flex-1">
+      <LinearGradient
+        colors={['#1a73e8', '#0d47a1']}
+        className="px-4 pb-4 pt-2"
+      >
+        <Button
+          variant="link"
+          onPress={() => router.back()}
+          className="mb-4 h-10 w-10 items-center justify-center rounded-full bg-white/10"
+        >
           <Ionicons name="arrow-back" size={24} color="#fff" />
-        </Pressable>
-        <Text style={styles.title}>Professionals On-site</Text>
-        <Text style={styles.subtitle}>{cafeName}</Text>
+        </Button>
+        <Text className="font-bold text-2xl text-white">
+          Professionals On-site
+        </Text>
+        <Text className="text-base text-white/80">{cafeName}</Text>
       </LinearGradient>
 
-      <ScrollView style={styles.content}>
-        {MOCK_PROFESSIONALS.map((professional, index) => (
+      <Box className="flex-1 p-4">
+        {MOCK_PROFESSIONALS.map(professional => (
           <Animated.View
             key={professional.id}
-            style={[
-              styles.card,
-              {
-                opacity: fadeAnim,
-                transform: [
-                  {
-                    translateY: fadeAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [50 * (index + 1), 0],
-                    }),
-                  },
-                ],
-              },
-            ]}
+            style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            }}
+            className="mb-4 rounded-2xl bg-white p-4 shadow-sm"
           >
-            <View style={styles.cardHeader}>
-              <Image
-                source={{ uri: professional.imageUrl }}
-                style={styles.avatar}
-              />
-              <View style={styles.userInfo}>
-                <Text style={styles.name}>{professional.name}</Text>
-                <Text style={styles.role}>{professional.role}</Text>
-                <Text style={styles.company}>{professional.company}</Text>
-              </View>
-              <View
-                style={[
-                  styles.statusBadge,
-                  {
-                    backgroundColor: `${getStatusColor(professional.status)}15`,
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.statusDot,
-                    { backgroundColor: getStatusColor(professional.status) },
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.statusText,
-                    { color: getStatusColor(professional.status) },
-                  ]}
-                >
-                  {getStatusText(professional.status)}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.skillsContainer}>
-              {professional.skills.map(skill => (
-                <View
-                  key={`${professional.id}-${skill}`}
-                  style={styles.skillBadge}
-                >
-                  <Text style={styles.skillText}>{skill}</Text>
-                </View>
-              ))}
-            </View>
-
-            <View style={styles.footer}>
-              <Text style={styles.timeText}>
-                <MaterialIcons name="access-time" size={14} color="#666" />{' '}
-                Checked in {professional.checkInTime}
-              </Text>
-              <Pressable
-                style={[
-                  styles.connectButton,
-                  professional.status === 'do-not-disturb' &&
-                  styles.connectButtonDisabled,
-                ]}
-                onPress={() => handleConnect(professional)}
-              >
-                <FontAwesome5
-                  name="user-plus"
-                  size={14}
-                  color={
-                    professional.status === 'do-not-disturb'
-                      ? '#666'
-                      : '#1a73e8'
+            <VStack space="sm">
+              <Box className="flex-row justify-between">
+                <VStack space="xs">
+                  <Text className="font-bold text-lg">{professional.name}</Text>
+                  <Text className="text-textLight600 text-sm">
+                    {professional.role}
+                  </Text>
+                  <Text className="text-textLight600 text-sm">
+                    {professional.company}
+                  </Text>
+                </VStack>
+                <Box
+                  className={
+                    professional.status === 'available'
+                      ? 'bg-success100 rounded-xl px-2 py-1'
+                      : 'bg-warning100 rounded-xl px-2 py-1'
                   }
-                />
-                <Text
-                  style={[
-                    styles.connectText,
-                    professional.status === 'do-not-disturb' &&
-                    styles.connectTextDisabled,
-                  ]}
                 >
-                  Connect
+                  <Text
+                    className={
+                      professional.status === 'available'
+                        ? 'text-success600 text-xs'
+                        : 'text-warning600 text-xs'
+                    }
+                  >
+                    {professional.status === 'available' ? 'Available' : 'Busy'}
+                  </Text>
+                </Box>
+              </Box>
+
+              <Box className="flex-row flex-wrap gap-2">
+                {professional.skills.map(skill => (
+                  <Box
+                    key={`${professional.id}-${skill}`}
+                    className="bg-backgroundLight200 rounded-2xl px-3 py-1.5"
+                  >
+                    <Text className="text-textLight600 text-xs">{skill}</Text>
+                  </Box>
+                ))}
+              </Box>
+
+              <Box className="flex-row items-center justify-between">
+                <Text className="text-textLight600 text-xs">
+                  <MaterialIcons name="access-time" size={14} color="#666" />{' '}
+                  Checked in {professional.checkInTime}
                 </Text>
-              </Pressable>
-            </View>
+                <Button
+                  size="sm"
+                  variant={
+                    professional.status === 'do-not-disturb'
+                      ? 'outline'
+                      : 'solid'
+                  }
+                  onPress={() => handleConnect(professional)}
+                  className="flex-row items-center px-3 py-1.5"
+                >
+                  <FontAwesome5
+                    name="user-plus"
+                    size={14}
+                    color={
+                      professional.status === 'do-not-disturb'
+                        ? '#666'
+                        : '#1a73e8'
+                    }
+                  />
+                  <Text
+                    className={
+                      professional.status === 'do-not-disturb'
+                        ? 'text-textLight600 ml-1.5'
+                        : 'text-primary600 ml-1.5'
+                    }
+                  >
+                    Connect
+                  </Text>
+                </Button>
+              </Box>
+            </VStack>
           </Animated.View>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+      </Box>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    padding: 16,
-    paddingTop: 8,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 12,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 4,
-  },
-  role: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 2,
-  },
-  company: {
-    fontSize: 14,
-    color: '#666',
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 8,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 6,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  skillsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 16,
-  },
-  skillBadge: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  skillText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timeText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  connectButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e8f0fe',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  connectButtonDisabled: {
-    backgroundColor: '#f0f0f0',
-  },
-  connectText: {
-    fontSize: 14,
-    color: '#1a73e8',
-    fontWeight: '500',
-    marginLeft: 6,
-  },
-  connectTextDisabled: {
-    color: '#666',
-  },
-});
