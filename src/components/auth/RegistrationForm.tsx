@@ -67,8 +67,9 @@ export default function RegistrationForm({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<RegistrationFormData>({
+    mode: 'onChange',
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       email: '',
@@ -284,30 +285,16 @@ export default function RegistrationForm({
 
           <HStack className="mt-6 w-full justify-end">
             <Button
-              onPress={handleSubmit(async data => {
-                try {
-                  const success = await onSubmit(data.email, data.password, {
-                    full_name: data.full_name,
-                    designation: data.designation,
-                    bio: data.bio,
-                    linkedin_url: data.linkedin_url,
-                    github_url: data.github_url,
-                  });
-
-                  if (!success) {
-                    throw new Error('Failed to create account');
-                  }
-                } catch (error) {
-                  console.error('Registration error:', error);
-                  Alert.alert(
-                    'Registration Failed',
-                    error instanceof Error
-                      ? error.message
-                      : 'An unknown error occurred',
-                  );
-                }
-              })}
-              disabled={loading}
+              onPress={handleSubmit(data =>
+                onSubmit(data.email, data.password, {
+                  full_name: data.full_name,
+                  designation: data.designation,
+                  bio: data.bio,
+                  linkedin_url: data.linkedin_url,
+                  github_url: data.github_url,
+                }),
+              )}
+              disabled={loading || !isValid}
               action="primary"
               variant="solid"
               size="lg"

@@ -66,49 +66,144 @@ export default function useAuth() {
       github_url?: string;
     },
   ) => {
-    console.log('email', email, 'password', password, 'userData', userData);
-    // try {
-    //   // Create auth user
-    //   const { data, error } = await supabase.auth.signUp({
-    //     email,
-    //     password,
-    //     options: {
-    //       data: {
-    //         full_name: userData.full_name,
-    //       },
-    //     },
-    //   });
+    try {
+      console.log('Starting signup process...');
 
-    //   if (error) throw error;
+      // Create auth user
+      // Auto confirm the user's email
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: userData.full_name,
+          },
+          emailRedirectTo: 'soshbru://login',
+        },
+      });
 
-    //   if (data?.user) {
-    //     // Create user profile in users table
-    //     const { error: profileError } = await supabase.from('users').insert([
-    //       {
-    //         id: data.user.id,
-    //         email: data.user.email,
-    //         ...userData,
-    //       },
-    //     ]);
+      if (authData?.user) {
+        // Force confirm the email
+        await supabase.auth.updateUser({
+          email_confirm: true,
+        });
+      }
 
-    //     if (profileError) throw profileError;
+      if (authError) {
+        console.error('Auth signup error:', authError);
+        if (authError.message?.includes('rate limit')) {
+          throw new Error(
+            'Too many signup attempts. Please wait a few minutes before trying again.',
+          );
+        }
+        throw new Error(authError.message);
+      }
 
-    //     Alert.alert(
-    //       'Verification Required',
-    //       'Please check your email for a verification link to complete your registration.',
-    //     );
+      if (!authData?.user) {
+        console.error('No user data returned from auth signup');
+        throw new Error('Failed to create account: No user data returned');
+      }
 
-    //     return true;
-    //   }
+      console.log('Auth signup successful, creating user profile...');
 
-    //   return false;
-    // } catch (error) {
-    //   Alert.alert(
-    //     'Signup Failed',
-    //     error instanceof Error ? error.message : 'Unknown error occurred',
-    //   );
-    //   return false;
-    // }
+      console.log('Creating user profile with data:', {
+        id: authData.user.id,
+        email: authData.user.email,
+        ...userData,
+      });
+
+      // First try just the insert without select
+      console.log('Attempting insert with auth user id:', authData.user.id);
+
+      console.log('Starting profile insert...');
+
+      const insertResult = await supabase.from('users').insert({
+        id: authData.user.id,
+        email: authData.user.email!,
+        full_name: userData.full_name,
+        designation: userData.designation || null,
+        bio: userData.bio || null,
+        linkedin_url: userData.linkedin_url || null,
+        github_url: userData.github_url || null,
+        preferences: {},
+        visibility: true,
+        is_premium: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        avatar_url: null,
+      });
+
+      console.log('Raw insert result:', insertResult);
+
+      if (insertResult.error) {
+        console.error('Insert error:', {
+          error: insertResult.error,
+          status: insertResult.status,
+        });
+        await supabase.auth.signOut();
+        throw new Error(
+          insertResult.error.message ||
+          `Failed to insert user profile (status: ${insertResult.status})`,
+        );
+      }
+
+      // Verify profile was created by fetching it
+      console.log('Verifying profile creation...');
+
+      const fetchResult = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      console.log('Fetch result:', fetchResult);
+
+      if (fetchResult.error) {
+        console.error('Error verifying profile:', {
+          error: fetchResult.error,
+          status: fetchResult.status,
+        });
+        await supabase.auth.signOut();
+        throw new Error(
+          `Failed to verify profile: ${fetchResult.error.message}`,
+        );
+      }
+
+      if (!fetchResult.data) {
+        console.error('No profile data found after creation');
+        await supabase.auth.signOut();
+        throw new Error('Profile could not be verified after creation');
+      }
+
+      console.log('Profile created and verified:', fetchResult.data);
+
+      // Auto sign in the user
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        console.error('Auto sign in failed:', signInError);
+        throw new Error('Account created but auto sign in failed');
+      }
+
+      console.log('Signup and auto sign in completed successfully');
+
+      // Set user state
+      setUser(fetchResult.data as AuthUser);
+      setIsLoggedIn(true);
+      router.replace('/(tabs)/home');
+
+      return true;
+    } catch (error) {
+      console.error('Signup process error:', error);
+      Alert.alert(
+        'Signup Failed',
+        error instanceof Error ? error.message : 'Unknown error occurred',
+      );
+      return false;
+    }
   };
 
   const logout = async () => {

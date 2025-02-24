@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Keyboard } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -34,6 +34,8 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ loading, onSubmit }: LoginFormProps) {
+  const router = useRouter();
+
   const [socialLoading, setSocialLoading] = useState<{
     google: boolean;
     apple: boolean;
@@ -216,6 +218,25 @@ export default function LoginForm({ loading, onSubmit }: LoginFormProps) {
               : 'Continue with LinkedIn'}
           </ButtonText>
           {socialLoading.linkedin && <ButtonSpinner />}
+        </Button>
+
+        <HStack className="items-center py-4">
+          <Divider className="flex-1" />
+          <Text className="px-4 text-gray-500">or continue with</Text>
+          <Divider className="flex-1" />
+        </HStack>
+
+        <Button
+          variant="outline"
+          size="lg"
+          className="mt-4 w-full"
+          onPress={() => {
+            router.replace('/(tabs)/home');
+          }}
+          disabled={socialLoading.linkedin}
+        >
+          <LinkIcon width={16} height={16} />
+          <ButtonText className="ml-2">Continue as a Guest</ButtonText>
         </Button>
       </VStack>
     </KeyboardAvoidingView>
