@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   Animated,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import {
@@ -11,26 +13,21 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
-import { MOCK_CAFES } from '@/screens/HomeScreen';
-import type { Cafe } from '@/types/cafe';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 
 import Layout from '@/components/Layout';
 import { NetworkingCard } from '@/components/NetworkingCard';
 import { RatingStars } from '@/components/RatingStars';
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { EmptyState } from '@/elements';
 
 export default function CafeDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const cafe = MOCK_CAFES.find((c: Cafe) => c.id === id);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const { cafe } = useLocalSearchParams();
+  console.log('🚀 ~ CafeDetailsScreen ~ cafe:', cafe);
 
-  useEffect(() => {
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const slideAnim = React.useRef(new Animated.Value(50)).current;
+
+  React.useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -66,22 +63,11 @@ export default function CafeDetailsScreen() {
   }; // Add state for check-in status
   const [isCheckedIn, setIsCheckedIn] = React.useState(false);
 
-  if (!cafe) {
-    return (
-      <Layout>
-        <EmptyState
-          title="Cafe Not Found"
-          description="Could not find the specified cafe"
-          buttonText="Go Back"
-          onPress={() => router.back()}
-        />
-      </Layout>
-    );
-  }
-
   return (
-    <Layout>
-      <ScrollView className="flex-1">
+    <Layout hasSafeArea={false}>
+      <ScrollView style={styles.scrollView}>
+        {/* Existing content */}
+
         {/* Add NetworkingCard */}
         <NetworkingCard
           cafeId={cafe.id}
@@ -90,10 +76,7 @@ export default function CafeDetailsScreen() {
           isCheckedIn={isCheckedIn}
           onCheckIn={() => setIsCheckedIn(true)}
           onViewProfessionals={() => {
-            router.push({
-              pathname: '/professionals',
-              params: { cafeName: cafe.name },
-            });
+            navigation.navigate('Professionals', { cafeName: cafe.name });
           }}
         />
         <View style={styles.imageContainer}>
@@ -102,7 +85,10 @@ export default function CafeDetailsScreen() {
             colors={['transparent', 'rgba(0,0,0,0.7)']}
             style={styles.gradient}
           />
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
+          <Pressable
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </Pressable>
         </View>
@@ -211,11 +197,8 @@ export default function CafeDetailsScreen() {
           {cafe.popularItems && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Workspace Packages</Text>
-              {cafe.popularItems.map(item => (
-                <View
-                  key={`${item.name}-${item.price}`}
-                  style={styles.packageItem}
-                >
+              {cafe.popularItems.map((item, index) => (
+                <View key={index} style={styles.packageItem}>
                   <View style={styles.packageHeader}>
                     <Text style={styles.packageName}>{item.name}</Text>
                     <Text style={styles.packagePrice}>{item.price}</Text>
