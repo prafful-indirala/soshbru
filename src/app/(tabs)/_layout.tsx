@@ -1,13 +1,9 @@
 import React, { createElement } from 'react';
 import { Tabs } from 'expo-router';
 import { CircleUser, HomeIcon, SearchIcon } from 'lucide-react-native';
+import { useStore } from '@/store';
 
 import { HapticTab } from '@/components/HapticTab';
-
-// Define styles outside of the component
-const tabBarStyle = {
-  // backgroundColor: '#020F1C',
-};
 
 // Data array for tabs
 const tabNavigationData = [
@@ -28,18 +24,21 @@ const tabNavigationData = [
   },
 ];
 
-// Define screen options once outside of the component
-const screenOptions = {
-  tabBarActiveTintColor: 'black',
-  tabBarInactiveTintColor: 'grey',
-  tabBarStyle,
-  headerShown: false,
-  tabBarButton: HapticTab,
-};
-
 export default function TabLayout() {
+  const theme = useStore(state => state.theme);
+
   return (
-    <Tabs screenOptions={screenOptions}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: theme === 'dark' ? '#F0F0FF' : '#4A2A85',
+        tabBarInactiveTintColor: theme === 'dark' ? '#6B7280' : '#9CA3AF',
+        tabBarStyle: {
+          backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
+        },
+        headerShown: false,
+        tabBarButton: HapticTab,
+      }}
+    >
       {tabNavigationData.map(tab => (
         <Tabs.Screen
           key={tab?.name}

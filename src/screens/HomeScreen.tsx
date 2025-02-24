@@ -3,7 +3,7 @@ import React from 'react';
 import useAuth from '@/hooks/useAuth';
 import Layout from '@/components/Layout';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import AnimatedButton from '@/components/ui/animated-button';
+import { Button, ButtonText } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 
@@ -15,11 +15,16 @@ export default function HomeScreen() {
       <VStack className="h-full content-center items-center justify-center gap-[8px]">
         <Text>Home Screen</Text>
         <ThemeToggle />
-        <AnimatedButton
-          text="Logout"
+
+        <Button
           onPress={logout}
-          className="mt-8 w-1/2 self-center rounded-full bg-blue-500 py-4"
-        />
+          action="primary"
+          variant="solid"
+          size="lg"
+          className="mt-6"
+        >
+          <ButtonText>Logout</ButtonText>
+        </Button>
       </VStack>
     </Layout>
   );

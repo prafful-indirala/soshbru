@@ -12,7 +12,7 @@ export default function SearchScreen() {
     <Layout>
       <VStack className="gap-16">
         <HStack className="items-center gap-2 self-center p-10">
-          <SearchIcon size={30} color="orange" />
+          <SearchIcon size={30} color="#4A2A85" />
           <Text>Search Feature coming soon...</Text>
         </HStack>
       </VStack>

@@ -42,7 +42,7 @@ export default function OnboardingDot({ index, scrollX }: OnboardingDotProps) {
         {
           height: 8,
           borderRadius: 4,
-          backgroundColor: '#007AFF',
+          backgroundColor: '#4A2A85', // Brand purple
           marginHorizontal: 4,
         },
         dotStyle,
