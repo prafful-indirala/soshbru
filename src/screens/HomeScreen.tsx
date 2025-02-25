@@ -86,7 +86,7 @@ export default function HomeScreen() {
           style={styles.headerGradient}
         >
           <Animated.Text style={[styles.title, { fontSize: headerTitleSize }]}>
-            Explore Workspaces
+            Explore Coffice Spots
           </Animated.Text>
         </LinearGradient>
       </Animated.View>

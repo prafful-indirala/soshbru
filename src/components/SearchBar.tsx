@@ -17,7 +17,7 @@ export const SearchBar = ({ value, onChangeText, onClear }: SearchBarProps) => {
       <Ionicons name="search" size={20} color="#666" className="mr-2" />
       <TextInput
         className="text-textDark900 flex-1 text-base"
-        placeholder="Search cafés..."
+        placeholder="Search coffice..."
         value={value}
         onChangeText={onChangeText}
         placeholderTextColor="#999"

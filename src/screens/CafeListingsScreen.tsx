@@ -122,7 +122,7 @@ export default function CafeListingsScreen() {
             <Input>
               <InputIcon as={SearchIcon} className="ml-2 text-gray-500" />
               <InputField
-                placeholder="Search cafes..."
+                placeholder="Search coffice..."
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onSubmitEditing={() => searchCafes(searchQuery)}
