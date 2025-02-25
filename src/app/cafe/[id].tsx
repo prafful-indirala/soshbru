@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import {
   FontAwesome5,
   Ionicons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MOCK_CAFES } from '@/screens/HomeScreen';
+import useCafes from '@/data/useCafe';
 import type { Cafe } from '@/types/cafe';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import Layout from '@/components/Layout';
@@ -25,10 +25,11 @@ import { EmptyState } from '@/elements';
 export default function CafeDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { data: MOCK_CAFES } = useCafes();
   const cafe = MOCK_CAFES.find((c: Cafe) => c.id === id);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  const [isCheckedIn, setIsCheckedIn] = React.useState(false);
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -62,10 +63,10 @@ export default function CafeDetailsScreen() {
   return (
     <Layout>
       <ScrollView className="flex-1">
-        <NetworkingCard
-          cafeId={cafe.id}
-          cafeName={cafe.name}
-          onSiteCount={cafe.professionalCount}
+        {/* <NetworkingCard
+          cafeId={cafe?.id}
+          cafeName={cafe?.name}
+          onSiteCount={cafe?.professionalCount}
           isCheckedIn={isCheckedIn}
           onCheckIn={() => setIsCheckedIn(true)}
           onViewProfessionals={() => {
@@ -74,7 +75,7 @@ export default function CafeDetailsScreen() {
               params: { cafeName: cafe.name },
             });
           }}
-        />
+        /> */}
 
         <Box className="relative h-[300px]">
           <Image
