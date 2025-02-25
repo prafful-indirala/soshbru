@@ -11,6 +11,7 @@ import Layout from '@/components/Layout';
 import { SearchBar } from '@/components/SearchBar';
 import { Box } from '@/components/ui/box';
 import { brandColors, grayScale } from '@/components/ui/colors-reference';
+import { Image } from '@/components/ui/image';
 import { Text } from '@/components/ui/text';
 
 export default function HomeScreen() {
@@ -60,13 +61,13 @@ export default function HomeScreen() {
   // Header animation based on scroll
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: [120, 80],
+    outputRange: [280, 80],
     extrapolate: 'clamp',
   });
 
   const headerTitleSize = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: [28, 22],
+    outputRange: [20, 22],
     extrapolate: 'clamp',
   });
 
@@ -86,35 +87,32 @@ export default function HomeScreen() {
           colors={[brandColors.purpleDark, brandColors.purple]}
           style={styles.headerGradient}
         >
-          <Animated.Text style={[styles.title, { fontSize: headerTitleSize }]}>
-            Explore Coffice Spots
-          </Animated.Text>
+          {/* <Animated.Text style={[styles.title, { fontSize: headerTitleSize }]}>
+            Coffice Spot
+          </Animated.Text> */}
+          <Box className="my-6 h-32 w-36 self-center">
+            <Image
+              source={require('../assets/images/coffice.png')}
+              alt="logo"
+              className="h-full w-full"
+            />
+          </Box>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onClear={() => setSearchQuery('')}
+          />
         </LinearGradient>
       </Animated.View>
 
-      {/* Search and Filters */}
-      <Animated.View
-        style={[
-          styles.searchContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY }],
-          },
-        ]}
-      >
-        <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onClear={() => setSearchQuery('')}
-        />
-        <Box>
+      {/*  Filters */}
+      {/* <Box>
           <FilterChips
             options={filterOptions}
             selectedFilters={selectedFilters}
             onToggleFilter={handleToggleFilter}
           />
-        </Box>
-      </Animated.View>
+        </Box> */}
 
       {/* Workspace Listings */}
       <Animated.ScrollView
@@ -183,10 +181,19 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 8,
     justifyContent: 'flex-end',
+    backgroundColor: grayScale.white,
+
+    // borderBottomLeftRadius: 20,
+    // borderBottomRightRadius: 20,
+    shadowColor: grayScale.gray900,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   title: {
     fontWeight: 'bold',
-    color: grayScale.white,
+    color: grayScale.gray700,
   },
   searchContainer: {
     padding: 16,

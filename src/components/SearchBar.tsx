@@ -14,7 +14,7 @@ interface SearchBarProps {
 
 export const SearchBar = ({ value, onChangeText, onClear }: SearchBarProps) => {
   return (
-    <HStack className="mb-4 h-12 items-center rounded-xl bg-white px-3 shadow-sm">
+    <HStack className="mb-4 h-12 items-center rounded-full border border-gray-200 bg-white px-3 shadow-sm">
       <Ionicons
         name="search"
         size={20}
@@ -23,7 +23,7 @@ export const SearchBar = ({ value, onChangeText, onClear }: SearchBarProps) => {
       />
       <TextInput
         className="text-textDark900 flex-1 text-base"
-        placeholder="Search coffice..."
+        placeholder="Explore Coffice Spot..."
         value={value}
         onChangeText={onChangeText}
         placeholderTextColor={grayScale.gray400}

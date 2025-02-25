@@ -4,6 +4,7 @@ import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { brandColors, grayScale } from '@/components/ui/colors-reference';
 
 export default function AccountScreen() {
@@ -131,6 +132,7 @@ export default function AccountScreen() {
         scrollEventThrottle={16}
         style={styles.scrollView}
       >
+        <ThemeToggle />
         {/* Professional Stats */}
         <View style={styles.statsContainer}>
           {[

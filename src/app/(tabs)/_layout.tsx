@@ -4,6 +4,7 @@ import { CircleUser, HomeIcon, SearchIcon } from 'lucide-react-native';
 import { useStore } from '@/store';
 
 import { HapticTab } from '@/components/HapticTab';
+import { brandColors } from '@/components/ui/colors-reference';
 
 // Data array for tabs
 const tabNavigationData = [
@@ -30,7 +31,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme === 'dark' ? '#F0F0FF' : '#4A2A85',
+        tabBarActiveTintColor: brandColors.purpleDark,
         tabBarInactiveTintColor: theme === 'dark' ? '#6B7280' : '#9CA3AF',
         tabBarStyle: {
           backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',

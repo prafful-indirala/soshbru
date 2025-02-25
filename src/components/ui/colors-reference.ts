@@ -6,9 +6,13 @@
 
 // Brand Colors
 export const brandColors = {
-  purple: '#4A2A85', // Primary brand color
-  purpleLight: '#F0F0FF', // Light purple background
-  purpleDark: '#6B46C1', // Secondary/gradient purple
+  // purple: '#4A2A85', // Primary brand color
+  // purpleLight: '#F0F0FF', // Light purple background
+  // purpleDark: '#6B46C1', // Secondary/gradient purple
+
+  purple: '#FFC67D', // Primary brand color
+  purpleLight: '#F5F5DC', // Light purple background
+  purpleDark: '#FF9164', // Secondary/gradient purple
 };
 
 // Gray Scale
@@ -36,7 +40,7 @@ export const statusColors = {
 
 // Gradient Colors
 export const gradients = {
-  brand: 'linear-gradient(to right, #4A2A85, #6B46C1)',
+  brand: `linear-gradient(to right, ${brandColors.purple},${brandColors.purpleDark})`,
   overlay: 'rgba(74, 42, 133, 0.1)', // Used for overlays and blur effects
 };
 
@@ -104,9 +108,9 @@ export const cssVariables = {
 
 // Quick Reference for Common Brand Colors
 export const quickReference = {
-  mainPurple: '#4A2A85', // Primary brand color
-  secondaryPurple: '#6B46C1', // Used in gradients
-  lightPurple: '#F0F0FF', // Background accent
+  mainPurple: brandColors.purple, // Primary brand color
+  secondaryPurple: brandColors.purpleDark, // Used in gradients
+  lightPurple: brandColors.purpleLight, // Background accent
   mainText: '#1F2937', // Primary text
   mainBackground: '#FFFFFF', // Primary background
 };

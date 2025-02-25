@@ -1,19 +1,20 @@
 import React from 'react';
-import { Animated } from 'react-native';
-import {
-  FontAwesome5,
-  Ionicons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Animated, TouchableOpacity } from 'react-native';
+import { MapPin, Star, Volume1, Wifi } from 'lucide-react-native';
 import { Cafe } from '@/types/cafe';
 
-import { RatingStars } from '@/components/RatingStars';
-import { StatusBadge } from '@/components/StatusBadge';
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallbackText,
+  AvatarGroup,
+  AvatarImage,
+} from '@/components/ui/avatar';
 import { Box } from '@/components/ui/box';
-import { grayScale, statusColors } from '@/components/ui/colors-reference';
+import { brandColors } from '@/components/ui/colors-reference';
+import { Divider } from '@/components/ui/divider';
 import { HStack } from '@/components/ui/hstack';
-import { Image } from '@/components/ui/image';
+import { ImageBackground } from '@/components/ui/image-background';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 
@@ -22,6 +23,11 @@ interface CafeCardProps {
   onPress: (cafe: Cafe) => void;
 }
 
+const avatars = [
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+  'https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+  'https://images.unsplash.com/photo-1614289371518-722f2615943d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+];
 export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
   const pressAnimation = React.useRef(new Animated.Value(1)).current;
 
@@ -45,123 +51,85 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
         onPress={() => onPress(cafe)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        className="mb-4 overflow-hidden rounded-2xl bg-white shadow-md"
       >
-        <Box className="relative">
-          <Image
+        <Box className="my-2 rounded-2xl border border-gray-200 bg-white shadow-lg">
+          <ImageBackground
             source={{ uri: cafe.imageUrl }}
-            alt={cafe.name}
-            className="h-[200px] w-full rounded-2xl"
-          />
-          <LinearGradient
-            colors={['transparent', `${grayScale.gray900}CC`]} // CC = 80% opacity
-            className="absolute bottom-0 left-0 right-0 h-[70%] rounded-2xl"
+            className="h-48 w-full overflow-hidden rounded-t-2xl"
           />
 
-          <Box className="absolute bottom-0 left-0 right-0 p-4">
-            <HStack className="mb-3 items-center justify-between">
-              <HStack className="mr-2 flex-1 items-center">
-                <Text className="mr-2 font-bold text-xl text-white">
-                  {cafe.name}
-                </Text>
-                <StatusBadge isOpen={cafe.isOpen} />
-              </HStack>
-              <Box className="bg-gray900/50 flex-row items-center rounded-xl px-2 py-1">
-                <FontAwesome5
-                  name="user-friends"
-                  size={12}
-                  color={grayScale.white}
-                />
-                <Text className="ml-1 text-xs text-white">
-                  {cafe.currentOccupancy}/50
-                </Text>
+          <Box className="p-4">
+            {/* Title and Rating */}
+            <Box className="mb-4 flex-row items-center justify-between">
+              <Text className="font-bold text-xl text-gray-900">
+                {cafe.name}
+              </Text>
+              <Box className="flex-row items-center rounded-full bg-yellow-100 px-2 py-1">
+                <Star size={16} color="#FFB800" fill="#FFB800" />
+                <Text className="ml-1 font-medium text-red-900">4.8</Text>
               </Box>
-            </HStack>
-
-            <Box className="bg-gray900/50 mb-3 flex-row justify-between rounded-lg p-2">
-              {/* WiFi Speed */}
-              <HStack className="mr-3 items-center">
-                <MaterialCommunityIcons
-                  name="wifi"
-                  size={16}
-                  color={
-                    cafe.wifiSpeed >= 100
-                      ? statusColors.success
-                      : cafe.wifiSpeed >= 50
-                        ? statusColors.warning
-                        : statusColors.error
-                  }
-                />
-                <Text className="ml-1 text-xs font-semibold text-white">
-                  {cafe.wifiSpeed} Mbps
-                </Text>
-              </HStack>
-
-              {/* Noise Level */}
-              <HStack className="mr-3 items-center">
-                <FontAwesome5
-                  name={
-                    cafe.noiseLevel === 'quiet'
-                      ? 'volume-off'
-                      : cafe.noiseLevel === 'moderate'
-                        ? 'volume-down'
-                        : 'volume-up'
-                  }
-                  size={14}
-                  color={
-                    cafe.noiseLevel === 'quiet'
-                      ? statusColors.success
-                      : cafe.noiseLevel === 'moderate'
-                        ? statusColors.warning
-                        : statusColors.error
-                  }
-                />
-                <Text className="ml-1 text-xs font-semibold text-white">
-                  {cafe.noiseLevel === 'quiet'
-                    ? 'Quiet Zone'
-                    : cafe.noiseLevel === 'moderate'
-                      ? 'Moderate'
-                      : 'Loud'}
-                </Text>
-              </HStack>
-
-              {/* Power Outlets */}
-              <HStack className="items-center">
-                <MaterialCommunityIcons
-                  name="power-socket"
-                  size={16}
-                  color={
-                    cafe.powerOutlets
-                      ? statusColors.success
-                      : statusColors.error
-                  }
-                />
-                <Text className="ml-1 text-xs font-semibold text-white">
-                  {cafe.powerOutlets ? 'Power Available' : 'Limited Power'}
-                </Text>
-              </HStack>
             </Box>
 
-            <HStack className="mb-2 items-center">
-              <RatingStars rating={cafe.rating} />
-              <Text className="ml-1 text-sm text-white">({cafe.reviews})</Text>
-              <Box className="mx-2 h-1 w-1 rounded-full bg-white" />
-              <Text className="text-sm text-white">
-                <Ionicons
-                  name="location-outline"
-                  size={14}
-                  color={grayScale.white}
-                />
-                {cafe.distance}
-              </Text>
-            </HStack>
+            {/* Amenities */}
+            <Box className="mb-4 flex-row items-center gap-3">
+              <Box className="flex-row items-center gap-1">
+                <Wifi size={16} color={brandColors.purpleDark} />
+                <Box className="h-1 w-8 rounded-lg bg-orange-500" />
+              </Box>
 
-            <HStack className="bg-success500/20 items-center rounded-xl px-2 py-1">
-              <FontAwesome5 name="laptop" size={12} color={grayScale.white} />
-              <Text className="ml-1 font-medium text-xs text-white">
-                {cafe.professionalCount} professionals working now
-              </Text>
-            </HStack>
+              <Box className="flex-row items-center">
+                <Volume1 size={16} color={brandColors.purpleDark} />
+                <Text className="ml-1 text-gray-600">Low</Text>
+              </Box>
+
+              <Box className="flex-row items-center">
+                <MapPin size={16} color={brandColors.purpleDark} />
+                <Text className="ml-1 text-gray-600">0.3 km</Text>
+              </Box>
+            </Box>
+
+            {/* Tags */}
+            {/* <Box className="mb-4 flex-row space-x-2">
+              {['Designer', 'Developer', 'Writer'].map(tag => (
+                <Box key={tag} className="rounded-full bg-gray-100 px-3 py-1">
+                  <Text className="text-sm text-gray-600">{tag}</Text>
+                </Box>
+              ))}
+            </Box> */}
+
+            <Divider className="mb-2" />
+            {/* Working Here & Check In */}
+            <Box className="flex-row items-center justify-between">
+              <Box className="flex-row items-center">
+                <HStack className="gap-0">
+                  <AvatarGroup>
+                    {avatars.map(avatar => (
+                      <Avatar
+                        size="sm"
+                        key={avatar}
+                        className="border-2 border-white"
+                      >
+                        <AvatarFallbackText>John Doe</AvatarFallbackText>
+                        <AvatarImage
+                          source={{
+                            uri: avatar,
+                          }}
+                        />
+                        {/* <AvatarBadge /> */}
+                      </Avatar>
+                    ))}
+                  </AvatarGroup>
+                </HStack>
+                <Text className="ml-2 text-gray-600">3 working here</Text>
+              </Box>
+
+              <TouchableOpacity
+                className="rounded-full bg-orange-400 px-4 py-2"
+                onPress={() => { }}
+              >
+                <Text className="font-medium text-white">👋🏻 I'm here</Text>
+              </TouchableOpacity>
+            </Box>
           </Box>
         </Box>
       </Pressable>
