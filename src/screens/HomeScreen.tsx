@@ -61,7 +61,7 @@ export default function HomeScreen() {
   // Header animation based on scroll
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: [280, 80],
+    outputRange: [280, 120],
     extrapolate: 'clamp',
   });
 
@@ -90,7 +90,15 @@ export default function HomeScreen() {
           {/* <Animated.Text style={[styles.title, { fontSize: headerTitleSize }]}>
             Coffice Spot
           </Animated.Text> */}
-          <Box className="my-6 h-32 w-36 self-center">
+          {/* <Box className="my-6 h-9 w-40">
+            <Image
+              source={require('../assets/images/coffice-logo.png')}
+              alt="logo"
+              className="h-full w-full"
+            />
+          </Box>
+           */}
+          <Box className="my-6 h-28 w-32 self-center">
             <Image
               source={require('../assets/images/coffice.png')}
               alt="logo"
