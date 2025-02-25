@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+
+import { HStack } from '@/components/ui/hstack';
+import { Text } from '@/components/ui/text';
 
 interface RatingStarsProps {
   rating: number;
@@ -8,21 +10,9 @@ interface RatingStarsProps {
 
 export const RatingStars = ({ rating }: RatingStarsProps) => {
   return (
-    <View style={styles.ratingContainer}>
-      <Text style={styles.ratingText}>{rating}</Text>
+    <HStack space="xs" className="items-center">
+      <Text className="text-white">{rating}</Text>
       <MaterialIcons name="star" size={16} color="#FFD700" />
-    </View>
+    </HStack>
   );
 };
-
-const styles = StyleSheet.create({
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingText: {
-    color: '#fff',
-    marginRight: 4,
-    fontSize: 14,
-  },
-});

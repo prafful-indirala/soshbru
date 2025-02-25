@@ -8,6 +8,12 @@ export interface Cafe {
   imageUrl: string;
   description: string;
   isOpen: boolean;
+  wifiSpeed: number;
+  noiseLevel: 'quiet' | 'moderate' | 'loud';
+  powerOutlets: boolean;
+  currentOccupancy: number;
+  professionalCount: number;
+  hasBookableSpace: boolean;
   address?: string;
   phone?: string;
   website?: string;

@@ -1,5 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+
+import { Box } from '@/components/ui/box';
+import { HStack } from '@/components/ui/hstack';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
 
 interface WorkPreferencesProps {
   preferences: string[];
@@ -9,40 +13,18 @@ export const WorkPreferences: React.FC<WorkPreferencesProps> = ({
   preferences,
 }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Work Preferences</Text>
-      {preferences.map((pref, index) => (
-        <View key={index} style={styles.preferenceItem}>
-          <Text style={styles.preferenceText}>• {pref}</Text>
-        </View>
-      ))}
-    </View>
+    <Box className="mb-4 rounded-xl bg-white p-4 shadow-sm">
+      <Text className="text-textDark900 mb-2 font-bold text-lg">
+        Work Preferences
+      </Text>
+      <VStack space="xs">
+        {preferences.map(pref => (
+          <HStack key={pref} space="xs">
+            <Text className="text-textLight600">•</Text>
+            <Text className="text-textLight600 text-sm">{pref}</Text>
+          </HStack>
+        ))}
+      </VStack>
+    </Box>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#1a1a1a',
-  },
-  preferenceItem: {
-    marginBottom: 4,
-  },
-  preferenceText: {
-    fontSize: 14,
-    color: '#444',
-  },
-});

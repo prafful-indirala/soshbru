@@ -1,11 +1,10 @@
 import React from 'react';
-import {
-  Animated,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import { Animated } from 'react-native';
+
+import { HStack } from '@/components/ui/hstack';
+import { Pressable } from '@/components/ui/pressable';
+import { ScrollView } from '@/components/ui/scroll-view';
+import { Text } from '@/components/ui/text';
 
 export type FilterOption = {
   id: string;
@@ -51,69 +50,40 @@ export const FilterChips = ({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+      className="h-10"
     >
-      {options.map(option => {
-        const isSelected = selectedFilters.includes(option.id);
-        return (
-          <Animated.View
-            key={option.id}
-            style={[
-              styles.chipContainer,
-              { transform: [{ scale: animatedValues[option.id] }] },
-            ]}
-          >
-            <Pressable
-              style={[styles.chip, isSelected && styles.selectedChip]}
-              onPress={() => onToggleFilter(option.id)}
-              onPressIn={() => handlePressIn(option.id)}
-              onPressOut={() => handlePressOut(option.id)}
+      <HStack space="sm" className="items-center px-4">
+        {options.map(option => {
+          const isSelected = selectedFilters.includes(option.id);
+
+          return (
+            <Animated.View
+              key={option.id}
+              style={[{ transform: [{ scale: animatedValues[option.id] }] }]}
             >
-              <Text
-                style={[styles.chipText, isSelected && styles.selectedChipText]}
+              <Pressable
+                onPress={() => onToggleFilter(option.id)}
+                onPressIn={() => handlePressIn(option.id)}
+                onPressOut={() => handlePressOut(option.id)}
+                className={`rounded-full border px-4 py-2 ${isSelected
+                    ? 'bg-textDark900 border-textDark900'
+                    : 'bg-backgroundLight100 border-backgroundLight300'
+                  }`}
               >
-                {option.label}
-              </Text>
-            </Pressable>
-          </Animated.View>
-        );
-      })}
+                <Text
+                  className={
+                    isSelected
+                      ? 'text-sm text-white'
+                      : 'text-textLight600 text-sm'
+                  }
+                >
+                  {option.label}
+                </Text>
+              </Pressable>
+            </Animated.View>
+          );
+        })}
+      </HStack>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 10,
-    height: 40,
-  },
-  contentContainer: {
-    paddingHorizontal: 16,
-    alignItems: 'center', // Center chips vertically
-  },
-  chipContainer: {
-    marginRight: 8,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 18,
-    backgroundColor: '#f5f5f5',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    height: '100%', // Fill chip container height
-    justifyContent: 'center', // Center text vertically
-  },
-  selectedChip: {
-    backgroundColor: '#1a1a1a',
-    borderColor: '#1a1a1a',
-  },
-  chipText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  selectedChipText: {
-    color: '#fff',
-  },
-});

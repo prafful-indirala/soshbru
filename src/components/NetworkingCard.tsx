@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated } from 'react-native';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// import { toast } from 'sonner-native';
+import { Box } from '@/components/ui/box';
+import { Button } from '@/components/ui/button';
+import { HStack } from '@/components/ui/hstack';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
 
 interface NetworkingCardProps {
   cafeId: string;
@@ -15,7 +19,8 @@ interface NetworkingCardProps {
 }
 
 export const NetworkingCard: React.FC<NetworkingCardProps> = ({
-  cafeName,
+  cafeId: _cafeId, // Using _ prefix to indicate intentionally unused prop
+  cafeName: _cafeName, // Using _ prefix to indicate intentionally unused prop
   onSiteCount,
   isCheckedIn,
   onCheckIn,
@@ -28,7 +33,6 @@ export const NetworkingCard: React.FC<NetworkingCardProps> = ({
   const handleCheckIn = () => {
     setIsAnimating(true);
 
-    // Scale animation
     Animated.sequence([
       Animated.spring(scaleAnim, {
         toValue: 0.95,
@@ -41,17 +45,11 @@ export const NetworkingCard: React.FC<NetworkingCardProps> = ({
     ]).start(() => {
       setIsAnimating(false);
       onCheckIn();
-
-      // Show success toast
-      // toast.success('Successfully checked in!', {
-      //   description: `You're now visible to other professionals at ${cafeName}`,
-      // });
     });
   };
 
   React.useEffect(() => {
     if (isCheckedIn) {
-      // Continuous pulse animation for checked-in state
       Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
@@ -67,48 +65,46 @@ export const NetworkingCard: React.FC<NetworkingCardProps> = ({
         ]),
       ).start();
     }
-  }, [isCheckedIn]);
+  }, [isCheckedIn, pulseAnim]);
 
   return (
-    <Animated.View
-      style={[styles.container, { transform: [{ scale: scaleAnim }] }]}
-    >
-      <LinearGradient
-        colors={isCheckedIn ? ['#4CAF50', '#2E7D32'] : ['#1a73e8', '#0d47a1']}
-        style={styles.gradient}
-      >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Networking</Text>
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }]}>
+      <Box className="mx-4 my-2 overflow-hidden rounded-2xl shadow-md">
+        <LinearGradient
+          colors={isCheckedIn ? ['#4CAF50', '#2E7D32'] : ['#1a73e8', '#0d47a1']}
+          className="p-4"
+        >
+          <HStack className="mb-4 items-center justify-between">
+            <Text className="font-bold text-xl text-white">Networking</Text>
             {isCheckedIn && (
-              <Animated.View
-                style={[
-                  styles.activeIndicator,
-                  { transform: [{ scale: pulseAnim }] },
-                ]}
-              >
-                <MaterialIcons name="verified" size={20} color="#fff" />
-                <Text style={styles.activeText}>On-site</Text>
+              <Animated.View style={[{ transform: [{ scale: pulseAnim }] }]}>
+                <HStack
+                  space="xs"
+                  className="items-center rounded-full bg-white/20 px-3 py-1.5"
+                >
+                  <MaterialIcons name="verified" size={20} color="#fff" />
+                  <Text className="font-semibold text-white">On-site</Text>
+                </HStack>
               </Animated.View>
             )}
-          </View>
+          </HStack>
 
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <FontAwesome5 name="users" size={20} color="#fff" />
-              <Text style={styles.statValue}>{onSiteCount}</Text>
-              <Text style={styles.statLabel}>Professionals On-site</Text>
-            </View>
-          </View>
+          <VStack space="lg" className="mb-5 items-center">
+            <FontAwesome5 name="users" size={20} color="#fff" />
+            <Text className="font-bold text-2xl text-white">{onSiteCount}</Text>
+            <Text className="text-white/80">Professionals On-site</Text>
+          </VStack>
 
-          <View style={styles.actionContainer}>
-            <Pressable
-              style={[
-                styles.button,
-                isCheckedIn ? styles.checkedInButton : styles.checkInButton,
-              ]}
+          <HStack space="md">
+            <Button
+              variant={isCheckedIn ? 'outline' : 'solid'}
               onPress={handleCheckIn}
               disabled={isAnimating || isCheckedIn}
+              className={
+                isCheckedIn
+                  ? 'flex-1 flex-row items-center bg-white'
+                  : 'flex-1 flex-row items-center bg-white/20'
+              }
             >
               <FontAwesome5
                 name={isCheckedIn ? 'check-circle' : 'location-arrow'}
@@ -116,122 +112,29 @@ export const NetworkingCard: React.FC<NetworkingCardProps> = ({
                 color={isCheckedIn ? '#4CAF50' : '#fff'}
               />
               <Text
-                style={[styles.buttonText, isCheckedIn && styles.checkedInText]}
+                className={
+                  isCheckedIn
+                    ? 'text-success600 ml-2 font-semibold'
+                    : 'ml-2 font-semibold text-white'
+                }
               >
                 {isCheckedIn ? 'Checked In' : 'Check In'}
               </Text>
-            </Pressable>
+            </Button>
 
-            <Pressable
-              style={[styles.button, styles.viewButton]}
+            <Button
+              variant="solid"
               onPress={onViewProfessionals}
+              className="flex-1 flex-row items-center bg-white"
             >
               <FontAwesome5 name="user-friends" size={16} color="#1a73e8" />
-              <Text style={[styles.buttonText, styles.viewButtonText]}>
+              <Text className="text-primary600 ml-2 font-semibold">
                 View Professionals
               </Text>
-            </Pressable>
-          </View>
-        </View>
-      </LinearGradient>
+            </Button>
+          </HStack>
+        </LinearGradient>
+      </Box>
     </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 16,
-    overflow: 'hidden',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  gradient: {
-    borderRadius: 16,
-  },
-  content: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  activeIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  activeText: {
-    color: '#fff',
-    marginLeft: 6,
-    fontWeight: '600',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 8,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 4,
-  },
-  actionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  button: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    gap: 8,
-  },
-  checkInButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  checkedInButton: {
-    backgroundColor: '#fff',
-  },
-  viewButton: {
-    backgroundColor: '#fff',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  checkedInText: {
-    color: '#4CAF50',
-  },
-  viewButtonText: {
-    color: '#1a73e8',
-  },
-});

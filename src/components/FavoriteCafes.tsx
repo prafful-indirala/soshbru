@@ -1,5 +1,9 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { Box } from '@/components/ui/box';
+import { HStack } from '@/components/ui/hstack';
+import { ScrollView } from '@/components/ui/scroll-view';
+import { Text } from '@/components/ui/text';
 
 interface FavoriteCafesProps {
   cafes: string[];
@@ -7,53 +11,22 @@ interface FavoriteCafesProps {
 
 export const FavoriteCafes: React.FC<FavoriteCafesProps> = ({ cafes }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Favorite Workspaces</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
-      >
-        {cafes.map((cafe, index) => (
-          <View key={index} style={styles.cafeChip}>
-            <Text style={styles.cafeText}>{cafe}</Text>
-          </View>
-        ))}
+    <Box className="mb-4 rounded-xl bg-white p-4 shadow-sm">
+      <Text className="text-textDark900 mb-2 font-bold text-lg">
+        Favorite Workspaces
+      </Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <HStack space="sm">
+          {cafes.map(cafe => (
+            <Box
+              key={`favorite-${cafe}`}
+              className="bg-backgroundLight100 rounded-full px-3 py-2"
+            >
+              <Text className="text-textDark600 text-sm">{cafe}</Text>
+            </Box>
+          ))}
+        </HStack>
       </ScrollView>
-    </View>
+    </Box>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#1a1a1a',
-  },
-  scrollContainer: {
-    flexDirection: 'row',
-  },
-  cafeChip: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginRight: 8,
-  },
-  cafeText: {
-    fontSize: 14,
-    color: '#444',
-  },
-});

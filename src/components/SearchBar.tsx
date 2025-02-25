@@ -1,6 +1,9 @@
 import React from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import { Button } from '@/components/ui/button';
+import { HStack } from '@/components/ui/hstack';
 
 interface SearchBarProps {
   value: string;
@@ -10,53 +13,20 @@ interface SearchBarProps {
 
 export const SearchBar = ({ value, onChangeText, onClear }: SearchBarProps) => {
   return (
-    <View style={styles.container}>
-      <Ionicons
-        name="search"
-        size={20}
-        color="#666"
-        style={styles.searchIcon}
-      />
+    <HStack className="mb-4 h-12 items-center rounded-xl bg-white px-3 shadow-sm">
+      <Ionicons name="search" size={20} color="#666" className="mr-2" />
       <TextInput
-        style={styles.input}
+        className="text-textDark900 flex-1 text-base"
         placeholder="Search cafés..."
         value={value}
         onChangeText={onChangeText}
         placeholderTextColor="#999"
       />
       {value.length > 0 && (
-        <Pressable onPress={onClear} style={styles.clearButton}>
+        <Button variant="link" onPress={onClear} className="p-1">
           <Ionicons name="close-circle" size={20} color="#666" />
-        </Pressable>
+        </Button>
       )}
-    </View>
+    </HStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    height: 48,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  clearButton: {
-    padding: 4,
-  },
-});
