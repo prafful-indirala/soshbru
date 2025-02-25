@@ -10,6 +10,7 @@ import { FilterChips } from '@/components/FilterChips';
 import Layout from '@/components/Layout';
 import { SearchBar } from '@/components/SearchBar';
 import { Box } from '@/components/ui/box';
+import { brandColors, grayScale } from '@/components/ui/colors-reference';
 import { Text } from '@/components/ui/text';
 
 export default function HomeScreen() {
@@ -82,7 +83,7 @@ export default function HomeScreen() {
       {/* Animated Header */}
       <Animated.View style={[styles.header, { height: headerHeight }]}>
         <LinearGradient
-          colors={['#1a73e8', '#0d47a1']}
+          colors={[brandColors.purpleDark, brandColors.purple]}
           style={styles.headerGradient}
         >
           <Animated.Text style={[styles.title, { fontSize: headerTitleSize }]}>
@@ -128,7 +129,7 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#1a73e8"
+            tintColor={brandColors.purpleDark}
           />
         }
       >
@@ -171,7 +172,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: grayScale.gray100,
   },
   header: {
     width: '100%',
@@ -185,14 +186,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    color: '#fff',
+    color: grayScale.white,
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: grayScale.white,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    shadowColor: '#000',
+    shadowColor: grayScale.gray900,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
   },
   noResults: {
     textAlign: 'center',
-    color: '#666',
+    color: grayScale.gray500,
     fontSize: 16,
     marginTop: 32,
   },

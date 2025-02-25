@@ -5,12 +5,13 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
-import { Cafe } from '@/types/cafe';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Cafe } from '@/types/cafe';
 
 import { RatingStars } from '@/components/RatingStars';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Box } from '@/components/ui/box';
+import { grayScale, statusColors } from '@/components/ui/colors-reference';
 import { HStack } from '@/components/ui/hstack';
 import { Image } from '@/components/ui/image';
 import { Pressable } from '@/components/ui/pressable';
@@ -53,7 +54,7 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
             className="h-[200px] w-full rounded-2xl"
           />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            colors={['transparent', `${grayScale.gray900}CC`]} // CC = 80% opacity
             className="absolute bottom-0 left-0 right-0 h-[70%] rounded-2xl"
           />
 
@@ -65,15 +66,19 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
                 </Text>
                 <StatusBadge isOpen={cafe.isOpen} />
               </HStack>
-              <Box className="flex-row items-center rounded-xl bg-black/50 px-2 py-1">
-                <FontAwesome5 name="user-friends" size={12} color="#fff" />
+              <Box className="bg-gray900/50 flex-row items-center rounded-xl px-2 py-1">
+                <FontAwesome5
+                  name="user-friends"
+                  size={12}
+                  color={grayScale.white}
+                />
                 <Text className="ml-1 text-xs text-white">
                   {cafe.currentOccupancy}/50
                 </Text>
               </Box>
             </HStack>
 
-            <Box className="mb-3 flex-row justify-between rounded-lg bg-black/50 p-2">
+            <Box className="bg-gray900/50 mb-3 flex-row justify-between rounded-lg p-2">
               {/* WiFi Speed */}
               <HStack className="mr-3 items-center">
                 <MaterialCommunityIcons
@@ -81,10 +86,10 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
                   size={16}
                   color={
                     cafe.wifiSpeed >= 100
-                      ? '#4CAF50'
+                      ? statusColors.success
                       : cafe.wifiSpeed >= 50
-                        ? '#FFC107'
-                        : '#FF5252'
+                        ? statusColors.warning
+                        : statusColors.error
                   }
                 />
                 <Text className="ml-1 text-xs font-semibold text-white">
@@ -105,10 +110,10 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
                   size={14}
                   color={
                     cafe.noiseLevel === 'quiet'
-                      ? '#4CAF50'
+                      ? statusColors.success
                       : cafe.noiseLevel === 'moderate'
-                        ? '#FFC107'
-                        : '#FF5252'
+                        ? statusColors.warning
+                        : statusColors.error
                   }
                 />
                 <Text className="ml-1 text-xs font-semibold text-white">
@@ -125,7 +130,11 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
                 <MaterialCommunityIcons
                   name="power-socket"
                   size={16}
-                  color={cafe.powerOutlets ? '#4CAF50' : '#FF5252'}
+                  color={
+                    cafe.powerOutlets
+                      ? statusColors.success
+                      : statusColors.error
+                  }
                 />
                 <Text className="ml-1 text-xs font-semibold text-white">
                   {cafe.powerOutlets ? 'Power Available' : 'Limited Power'}
@@ -138,13 +147,17 @@ export const CafeCard = ({ cafe, onPress }: CafeCardProps) => {
               <Text className="ml-1 text-sm text-white">({cafe.reviews})</Text>
               <Box className="mx-2 h-1 w-1 rounded-full bg-white" />
               <Text className="text-sm text-white">
-                <Ionicons name="location-outline" size={14} color="#fff" />
+                <Ionicons
+                  name="location-outline"
+                  size={14}
+                  color={grayScale.white}
+                />
                 {cafe.distance}
               </Text>
             </HStack>
 
             <HStack className="bg-success500/20 items-center rounded-xl px-2 py-1">
-              <FontAwesome5 name="laptop" size={12} color="#fff" />
+              <FontAwesome5 name="laptop" size={12} color={grayScale.white} />
               <Text className="ml-1 font-medium text-xs text-white">
                 {cafe.professionalCount} professionals working now
               </Text>

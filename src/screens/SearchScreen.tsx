@@ -15,11 +15,13 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Cafe } from '@/types/cafe';
 
+import { brandColors, grayScale } from '@/components/ui/colors-reference';
+
 import { CafeCard } from '../components/CafeCard';
 
 const { width } = Dimensions.get('window');
 
-const MOCK_CAFES = [
+const MOCK_CAFES: Cafe[] = [
   {
     id: '1',
     name: 'The Digital Den',
@@ -33,13 +35,12 @@ const MOCK_CAFES = [
       'Premium workspace with high-speed internet and dedicated quiet zones for focused work.',
     isOpen: true,
     wifiSpeed: 300,
-    noiseLevel: 'quiet',
+    noiseLevel: 'quiet' as const,
     powerOutlets: true,
     currentOccupancy: 15,
     professionalCount: 12,
     hasBookableSpace: true,
   },
-  // ... other cafes
 ];
 
 export default function SearchScreen() {
@@ -117,7 +118,10 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1a73e8', '#0d47a1']} style={styles.gradient}>
+      <LinearGradient
+        colors={[brandColors.purpleDark, brandColors.purple]}
+        style={styles.gradient}
+      >
         <Animated.View
           style={[
             styles.header,
@@ -149,7 +153,7 @@ export default function SearchScreen() {
               style={styles.wheelImage}
             />
             <View style={styles.wheelCenter}>
-              <FontAwesome5 name="compass" size={32} color="#fff" />
+              <FontAwesome5 name="compass" size={32} color={grayScale.white} />
             </View>
           </Animated.View>
 
@@ -194,7 +198,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a73e8',
+    backgroundColor: brandColors.purpleDark,
   },
   gradient: {
     flex: 1,
@@ -208,13 +212,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: grayScale.white,
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
+    color: `${grayScale.white}CC`, // CC = 80% opacity
     textAlign: 'center',
   },
   wheelContainer: {
@@ -225,9 +229,9 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     height: width * 0.8,
     borderRadius: width * 0.4,
-    backgroundColor: '#fff',
+    backgroundColor: grayScale.white,
     elevation: 10,
-    shadowColor: '#000',
+    shadowColor: grayScale.gray900,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
@@ -246,17 +250,17 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1a73e8',
+    backgroundColor: brandColors.purpleDark,
     justifyContent: 'center',
     alignItems: 'center',
   },
   spinButton: {
-    backgroundColor: '#fff',
+    backgroundColor: grayScale.white,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: grayScale.gray900,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -267,7 +271,7 @@ const styles = StyleSheet.create({
   spinButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a73e8',
+    color: brandColors.purpleDark,
   },
   resultContainer: {
     marginTop: 20,
@@ -275,7 +279,7 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#fff',
+    color: grayScale.white,
     marginBottom: 16,
     textAlign: 'center',
   },

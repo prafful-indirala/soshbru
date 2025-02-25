@@ -1,25 +1,18 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { brandColors, grayScale } from '@/components/ui/colors-reference';
+
 export default function AccountScreen() {
-  const { width } = useWindowDimensions();
   const scrollY = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
-  const statsAnimations = [0, 1, 2].map(
-    () => useRef(new Animated.Value(0)).current,
-  );
-  const [activeTab, setActiveTab] = React.useState('overview');
+  const statsAnimations = useRef(
+    [0, 1, 2].map(() => new Animated.Value(0)),
+  ).current;
   const [networkingVisible, setNetworkingVisible] = React.useState(true);
 
   // Profile data
@@ -37,14 +30,15 @@ export default function AccountScreen() {
     },
     skills: ['React Native', 'TypeScript', 'UI/UX', 'Cloud Architecture'],
     preferences: [
-      { icon: 'wifi', label: 'High-Speed WiFi (300+ Mbps)' },
-      { icon: 'volume-off', label: 'Quiet Environment' },
-      { icon: 'laptop', label: 'Ergonomic Setup' },
-      { icon: 'people', label: 'Networking Friendly' },
+      { icon: 'wifi' as const, label: 'High-Speed WiFi (300+ Mbps)' },
+      { icon: 'volume-off' as const, label: 'Quiet Environment' },
+      { icon: 'laptop' as const, label: 'Ergonomic Setup' },
+      { icon: 'user-friends' as const, label: 'Networking Friendly' },
     ],
   };
 
   useEffect(() => {
+    // Start animations
     Animated.sequence([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -69,7 +63,7 @@ export default function AccountScreen() {
         ),
       ),
     ]).start();
-  }, []);
+  }, [fadeAnim, scaleAnim, statsAnimations]);
 
   const headerTranslate = scrollY.interpolate({
     inputRange: [0, 200],
@@ -96,7 +90,7 @@ export default function AccountScreen() {
         ]}
       >
         <LinearGradient
-          colors={['#1a73e8', '#0d47a1']}
+          colors={[brandColors.purpleDark, brandColors.purple]}
           style={styles.headerGradient}
         >
           <Animated.Image
@@ -118,7 +112,11 @@ export default function AccountScreen() {
           <Animated.View
             style={[styles.locationContainer, { opacity: fadeAnim }]}
           >
-            <Ionicons name="location-outline" size={16} color="#fff" />
+            <Ionicons
+              name="location-outline"
+              size={16}
+              color={grayScale.white}
+            />
             <Text style={styles.location}>{profile.location}</Text>
           </Animated.View>
         </LinearGradient>
@@ -137,23 +135,26 @@ export default function AccountScreen() {
         <View style={styles.statsContainer}>
           {[
             {
-              icon: 'timer',
+              id: 'focus',
+              icon: 'timer' as const,
               value: profile.stats.focusHours,
               label: 'Focus Hours',
             },
             {
-              icon: 'location-on',
+              id: 'workspaces',
+              icon: 'location-on' as const,
               value: profile.stats.workspaces,
               label: 'Workspaces',
             },
             {
-              icon: 'people',
+              id: 'network',
+              icon: 'people' as const,
               value: profile.stats.connections,
               label: 'Network',
             },
           ].map((stat, index) => (
             <Animated.View
-              key={index}
+              key={stat.id}
               style={[
                 styles.statItem,
                 {
@@ -170,7 +171,11 @@ export default function AccountScreen() {
                 },
               ]}
             >
-              <MaterialIcons name={stat.icon} size={24} color="#1a73e8" />
+              <MaterialIcons
+                name={stat.icon}
+                size={24}
+                color={brandColors.purpleDark}
+              />
               <Text style={styles.statValue}>{stat.value}</Text>
               <Text style={styles.statLabel}>{stat.label}</Text>
             </Animated.View>
@@ -187,8 +192,8 @@ export default function AccountScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Skills</Text>
           <View style={styles.skillsContainer}>
-            {profile.skills.map((skill, index) => (
-              <View key={index} style={styles.skillBadge}>
+            {profile.skills.map(skill => (
+              <View key={skill} style={styles.skillBadge}>
                 <Text style={styles.skillText}>{skill}</Text>
               </View>
             ))}
@@ -198,9 +203,13 @@ export default function AccountScreen() {
         {/* Work Preferences */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Work Preferences</Text>
-          {profile.preferences.map((pref, index) => (
-            <View key={index} style={styles.preferenceItem}>
-              <FontAwesome5 name={pref.icon} size={16} color="#1a73e8" />
+          {profile.preferences.map(pref => (
+            <View key={pref.label} style={styles.preferenceItem}>
+              <FontAwesome5
+                name={pref.icon}
+                size={16}
+                color={brandColors.purpleDark}
+              />
               <Text style={styles.preferenceText}>{pref.label}</Text>
             </View>
           ))}
@@ -241,7 +250,7 @@ export default function AccountScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: grayScale.gray50,
   },
   header: {
     height: 250,
@@ -262,17 +271,17 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: '#fff',
+    borderColor: grayScale.white,
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: grayScale.white,
     marginTop: 12,
   },
   designation: {
     fontSize: 16,
-    color: '#fff',
+    color: grayScale.white,
     opacity: 0.9,
     marginTop: 4,
   },
@@ -283,7 +292,7 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: '#fff',
+    color: grayScale.white,
     marginLeft: 4,
     opacity: 0.9,
   },
@@ -295,10 +304,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: grayScale.white,
     borderRadius: 16,
     margin: 16,
-    shadowColor: '#000',
+    shadowColor: grayScale.gray900,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -310,21 +319,21 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: grayScale.gray900,
     marginTop: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: grayScale.gray500,
     marginTop: 2,
   },
   section: {
     margin: 16,
     marginTop: 0,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: grayScale.white,
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: grayScale.gray900,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -333,12 +342,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: grayScale.gray900,
     marginBottom: 12,
   },
   bio: {
     fontSize: 14,
-    color: '#666',
+    color: grayScale.gray500,
     lineHeight: 22,
   },
   skillsContainer: {
@@ -347,7 +356,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   skillBadge: {
-    backgroundColor: '#e8f0fe',
+    backgroundColor: `${brandColors.purpleDark}10`,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -355,7 +364,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   skillText: {
-    color: '#1a73e8',
+    color: brandColors.purpleDark,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -366,7 +375,7 @@ const styles = StyleSheet.create({
   },
   preferenceText: {
     fontSize: 14,
-    color: '#666',
+    color: grayScale.gray500,
     marginLeft: 12,
   },
   networkingHeader: {
@@ -376,25 +385,25 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   networkingToggle: {
-    backgroundColor: '#f1f3f4',
+    backgroundColor: grayScale.gray100,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   networkingToggleActive: {
-    backgroundColor: '#e8f0fe',
+    backgroundColor: `${brandColors.purpleDark}10`,
   },
   networkingToggleText: {
     fontSize: 14,
-    color: '#666',
+    color: grayScale.gray500,
   },
   networkingToggleTextActive: {
-    color: '#1a73e8',
+    color: brandColors.purpleDark,
     fontWeight: '500',
   },
   networkingDescription: {
     fontSize: 14,
-    color: '#666',
+    color: grayScale.gray500,
     marginTop: 8,
   },
 });

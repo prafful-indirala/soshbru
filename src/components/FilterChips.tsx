@@ -1,6 +1,7 @@
 import React from 'react';
 import { Animated, StyleSheet } from 'react-native';
 
+import { grayScale } from '@/components/ui/colors-reference';
 import { HStack } from '@/components/ui/hstack';
 import { Pressable } from '@/components/ui/pressable';
 import { ScrollView } from '@/components/ui/scroll-view';
@@ -139,10 +140,10 @@ export const FilterChips = React.memo(FilterChipsComponent);
 const styles = StyleSheet.create({
   selectedText: {
     fontSize: 14,
-    color: '#fff',
+    color: grayScale.white,
   },
   normalText: {
     fontSize: 14,
-    color: '#4B5563',
+    color: grayScale.gray600, // #4B5563
   },
 });
